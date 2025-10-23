@@ -78,7 +78,7 @@ def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_d
     """
     for cat in cat_var_dict:
         
-        variable = convert_categorical_variable(cat_dict=cat_var_dict[cat], name=cat)
+        variable = convert_categorical_variable(cat_list=cat_var_dict[cat], name=cat)
         parameters.append(variable)
 
     for sub in sub_var_dict:
