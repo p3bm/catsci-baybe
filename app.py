@@ -233,6 +233,10 @@ def main():
     num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
     cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
+    if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
+        st.error("This tool does support mixing discrete and continuous variables - please use one type or the other exclusively.")
+        st.stop()
+
     st.subheader("Objectives")
     
     num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
@@ -258,14 +262,11 @@ def main():
         "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
         ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
-    if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
-        st.error("This tool does support mixing discrete and continuous variables - please use one type or the other exclusively.")
-    else: 
-        strategy = TwoPhaseMetaRecommender(
-                        initial_recommender= strategy_functions_first[initial_recommender],
-                        recommender=SequentialGreedyRecommender(
-                            surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
-                        ),)
+    strategy = TwoPhaseMetaRecommender(
+                    initial_recommender= strategy_functions_first[initial_recommender],
+                    recommender=SequentialGreedyRecommender(
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                    ),)
     
     st.divider()
     st.header("Create Reaction Space")
