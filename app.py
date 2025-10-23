@@ -202,7 +202,12 @@ def main():
             2. Upload the updated `.csv` and `.json`.  
             3. Request new recommendations.  
             Repeat until your objectives stop improving.
+
+            ---
             
+            ### **Known Issues**
+            - Does not yet support specifying a tolerance values on experimental variables.
+            - Does not support the mixed use of discrete and continuous numerical variables (stick to one type or the other).
             """)
 
     # Store the initial value of widgets in session state
