@@ -15,6 +15,7 @@ from baybe.surrogates import (
 import json
 from io import StringIO
 import pandas as pd
+from datetime import datetime
 
 
 ACQ_FUNCTION = "qEI"
@@ -121,42 +122,37 @@ def recommend_input():
         
 
 def main():
+    st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
 
-    with st.expander("📘 User Guide: How to Use the Bayesian Reaction Optimizer"):
+    with st.expander("User Guide: How to Use the Bayesian Reaction Optimizer"):
         st.markdown("""
-            ### 🧪 **Overview**
+            ### **Overview**
             This tool helps you **design and optimize chemical reactions** using Bayesian Optimization via **BayBE**.  
             It suggests which experiments to run next to improve one or more objectives — for example, yield or selectivity.
             
             ---
             
             ### **1️⃣ Define Your Variables**
-            Describe all the factors that define your reaction space:
+            Describe all the factors that define the reaction space:
             
-            - **Categorical variables** – qualitative choices (e.g., *base treatment*: ground, unground).  
-            - **Substance variables** – chemical components with SMILES strings (e.g., *solvent*: ethanol → `CCO`).  
-            - **Discrete numerical variables** – numeric values with fixed options (e.g., *temperature*: 40, 60, 80).  
-            - **Continuous numerical variables** – numeric ranges (e.g., *equivalents*: 0.8, 2.0).  
-            
-            💡 *Tip:* Use “discrete” for small fixed sets, and “continuous” for ranges where exploration is desired.
+            - **Categorical variables** – qualitative choices such as whether a base is ground or unground.  
+            - **Substance variables** – chemical components that can be represented by SMILES strings (e.g. solvents, additives).  
+            - **Discrete numerical variables** – numeric values with fixed options.  
+            - **Continuous numerical variables** – a range of numeric values.
             
             ---
             
             ### **2️⃣ Define Your Objective(s)**
-            Specify what you want to optimize.
-            
-            - Example:  
-              - Objective: **Yield**, mode: `max`  
-              - Objective: **Selectivity**, mode: `max`
-            - Assign **weights** if optimizing multiple objectives (e.g., `70,30`).
-            
-            ⚠️ The number of weights must match the number of objectives.
+            Specify what to optimize, such as yield, selectivity, or ee.
+            The mode can be set to `max` or `min` to maimise or minimise the chosen objective as required.
+            If multiple objectives are used, the weighting of the importance of each objective can be specified.
+            Make sure there are the same number of weights as objectives!
             
             ---
             
             ### **3️⃣ Choose Recommender Strategy**
-            You’ll pick two recommenders that guide the optimization process:
+            Pick two recommenders that guide the optimization process:
             
             - **Initial recommender** *(used before any data exists)*:
               - `Random` – Picks random conditions (pure exploration).  
@@ -174,7 +170,7 @@ def main():
             ### **4️⃣ Generate the Campaign**
             Once inputs are ready:
             1. Click **“Generate”** to create your optimization campaign.  
-            2. Download the resulting **`campaign.json`** file to save your setup.
+            2. Download the resulting **`*_campaign.json`** file to save your setup.
             
             ---
             
@@ -192,7 +188,7 @@ def main():
             2. Click **“Get recommendations.”**  
             3. View, edit, and download:
                - Suggested experiments as **`reactions.csv`**  
-               - Updated campaign file as **`campaign.json`**
+               - Updated campaign file as **`*_campaign.json`**
             
             ---
             
@@ -203,13 +199,6 @@ def main():
             3. Request new recommendations.  
             Repeat until your objectives stop improving.
             
-            ---
-            
-            ### ✅ **Tips for Best Results**
-            - Start with **Farthest Point Sampling** for good initial coverage.  
-            - Use **Gaussian Process** for fine-tuning after data collection.  
-            - Keep all units and objective values consistent.  
-            - Avoid duplicate or missing variable names across inputs.
             """)
 
     # Store the initial value of widgets in session state
@@ -283,7 +272,8 @@ def main():
                                             disc_numerical_variables_dict, cont_numerical_variables_dict, 
                                             objective_dict, strategy, weights)
             st.session_state.scope = campaign_json
-            st.download_button("Download", campaign_json, file_name= 'campaign.json')
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+            st.download_button("Download", campaign_json, file_name= f'{now}_campaign.json')
 
     st.divider()
     st.header("Recommend Reactions")
@@ -293,7 +283,7 @@ def main():
     else:
         campaign_previous = st.session_state.scope
     
-    batch_reactions = st.number_input("Select **batch size**", min_value= 1, value= 1, key = 'batch')
+    batch_reactions = st.number_input("Select **Number of reactions to suggest**", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
 
     if campaign_previous:
@@ -302,13 +292,9 @@ def main():
     if st.button("Get recommendations"):
         if reactions is not None and new_campaign is not None:
             st.data_editor(reactions)
-            st.download_button("Download JSON file", new_campaign, file_name= "campaign.json")
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+            st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
             st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-            # st.write(reactions)
-
-
-
-
 
 if __name__ == "__main__":
     main()
