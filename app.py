@@ -258,7 +258,7 @@ def main():
         "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
         ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
-    if (num_disc_numerical_variables > 0) and (num_cont_numerical_values > 0):
+    if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
         strategy = SequentialGreedyRecommender(
                     surrogate_model=strategy_functions_second[second_recommender],
                     acquisition_function=ACQ_FUNCTION
