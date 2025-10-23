@@ -79,15 +79,16 @@ def create_continuous_numerical_fields(num_numerical_variables):
         variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
         variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
         bounds = [value.strip() for value in variable_values.split(',')]
-
-        if len(bounds) > 2:
-            st.error("The continuous categorical variable requires only lower and upper bound values.")
-
         try:
             bounds = (bounds[0],bounds[1])
         except IndexError:
-            st.stop()
+            None
         variable_dict[variable_name] = bounds
+
+    for key in variable_dict:
+        if len(variable_dict[key]) > 2:
+            st.error("The continuous categorical variable requires only lower and upper bound values.")
+            
     return variable_dict
 
 def create_objective_fields(num_objective_variables):
@@ -236,6 +237,11 @@ def main():
     st.subheader("Continuous Numerical Variables")
 
     num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
+
+    if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
+        st.error("This tool does not support mixing discrete and continuous numerical variables - please use one type or the other exclusively.")
+        st.stop()
+    
     cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
     st.subheader("Objectives")
