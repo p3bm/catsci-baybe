@@ -61,30 +61,44 @@ def convert_objective_variable(name, mode):
 
 
 
-def convert_params(categorical_variables_dict, numerical_variables_dict, objective_dict) -> list:
+def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> list:
     parameters = []
     objectives = []
     """_summary_
 
     Args:
-        categorical_variables_dict (_type_): _description_
-        numerical_variables_dict (_type_): _description_
+        cat_var_dict (_type_): _description_
+        sub_var_dict (_type_): _description_
+        num_disc_var_dict (_type_): _description_
+        num_cont_var_dict (_type_): _description_
+        obj_dict (_type_): _description_
 
     Returns:
         list: _description_
     """
-    for cat in categorical_variables_dict:
+    for cat in cat_var_dict:
         
-        variable = convert_categorical_variable(cat_dict= categorical_variables_dict[cat], name = cat)
+        variable = convert_categorical_variable(cat_dict=cat_var_dict[cat], name=cat)
         parameters.append(variable)
 
-    for numerical in numerical_variables_dict:
-        variable = convert_numerical_variable(num_list = numerical_variables_dict[numerical], name = numerical)
+    for sub in sub_var_dict:
+        
+        variable = convert_substance_variable(sub_dict=sub_var_dict[sub], name=sub)
+        parameters.append(variable)
+
+    for num in num_disc_var_dict:
+        
+        variable = convert_discrete_numerical_variable(num_list=num_disc_var_dict[num], name=num)
+        parameters.append(variable)
+
+    for num in num_cont_var_dict:
+        
+        variable = convert_continuous_numerical_variable(bounds_tuple=num_cont_var_dict[num], name=num)
         parameters.append(variable)
     
-    
-    for obj in objective_dict:
-        target = convert_objective_variable(name = obj, mode= objective_dict[obj][0].upper())
+    for obj in obj_dict:
+        
+        target = convert_objective_variable(name = obj, mode= obj_dict[obj][0].upper())
         objectives.append(target)
 
     return parameters, objectives
