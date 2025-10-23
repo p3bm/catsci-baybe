@@ -1,14 +1,14 @@
 from baybe import Campaign
 # from baybe.objective import Objective
 from baybe.objectives import SingleTargetObjective, DesirabilityObjective
-from baybe.parameters import NumericalDiscreteParameter, SubstanceParameter
+from baybe.parameters import NumericalDiscreteParameter, NumericalContinuousParameter, CategoricalParameter, SubstanceParameter
 from baybe.searchspace import SearchSpace
 from baybe.targets import NumericalTarget
 import streamlit as st
 import pandas as pd
 import json
 
-def convert_categorical_variable(cat_dict, name):
+def convert_substance_variable(cat_dict, name):
     """_summary_
 
     Args:
@@ -19,13 +19,34 @@ def convert_categorical_variable(cat_dict, name):
 
 
 
-def convert_numerical_variable(num_list, name):
+def convert_categorical_variable(cat_list, name):
     """_summary_
 
     Args:
-        numerical_variables_dict (_type_): _description_
+        cat_list (_type_): _description_
+        name (_type_): _description_
     """
-    return NumericalDiscreteParameter(name, values= num_list)
+    return CategoricalParameter(name, values=cat_list)
+
+
+
+def convert_discrete_numerical_variable(num_list, name):
+    """_summary_
+
+    Args:
+        num_list (_type_): _description_
+    """
+    return NumericalDiscreteParameter(name, values=num_list)
+
+
+
+def convert_continuous_numerical_variable(bounds_tuple, name):
+    """_summary_
+
+    Args:
+        bounds_tuple (_type_): _description_
+    """
+    return NumericalContinuousParameter(name, bounds=bounds_tuple)
 
 
 
@@ -36,9 +57,7 @@ def convert_objective_variable(name, mode):
         name (_type_): _description_
         mode (_type_): _description_
     """
-
-    return NumericalTarget(name= name, mode= mode, bounds=(0, 100), transformation="LINEAR")
-
+    return NumericalTarget(name=name, mode=mode, bounds=(0, 100), transformation="LINEAR")
 
 
 
