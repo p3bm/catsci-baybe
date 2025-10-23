@@ -280,24 +280,16 @@ def main():
                                             disc_numerical_variables_dict, cont_numerical_variables_dict, 
                                             objective_dict, strategy, weights)
             
-            st.session_state.scope = campaign_json
-            
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
 
     st.divider()
     st.header("Recommend Reactions")
 
-    if st.session_state.scope is None:
-        campaign_previous = upload_file(key='Campaign JSON')
-    else:
-        campaign_previous = st.session_state.scope
+    campaign_previous = upload_file(key='Campaign JSON')
     
     batch_reactions = st.number_input("Select **Number of reactions to suggest**", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
-
-    if not campaign_previous:
-        st.stop()
     
     reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
     
@@ -307,9 +299,6 @@ def main():
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
             st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-
-    if st.button("Update locally stored reaction scope for this session"):
-        st.session_state.scope = new_campaign
 
 if __name__ == "__main__":
     main()
