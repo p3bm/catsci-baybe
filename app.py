@@ -130,23 +130,27 @@ def main():
         st.session_state.disabled = False
 
     with tab1:
-        st.header("Create Scope")
-        col1, col2 = st.columns(2)
-        with col1:
-            num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
-            categorical_variables_dict = create_categorical_fields(num_categorical_variables)
+        st.subheader("Categorical Variables")
 
-            num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
-            substance_variables_dict = create_substance_fields(num_sub_variables)
+        num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
+        categorical_variables_dict = create_categorical_fields(num_categorical_variables)
+
+        st.subheader("Substance Variables")
+
+        num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
+        substance_variables_dict = create_substance_fields(num_sub_variables)
+
+        st.subheader("Discrete Numerical Variables")
             
-        with col2:
-            num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
-            disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
+        num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
+        disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
 
-            num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
-            cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
+        st.subheader("Continuous Numerical Variables")
 
-        st.divider()
+        num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
+        cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
+
+        st.subheader("Objectives")
         
         num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
         objective_dict = create_objective_fields(num_objectives)
@@ -156,6 +160,8 @@ def main():
 
         if num_objectives != len(weights):
             st.error("Please make sure there are the same number of objectives as objective weights.")
+
+        st.subheader("Select Recommenders")
         
         initial_recommender = st.selectbox(
             'Select a stratgey to use for the initial recommendations:',
