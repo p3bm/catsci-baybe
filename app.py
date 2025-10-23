@@ -236,11 +236,12 @@ def main():
     st.subheader("Continuous Numerical Variables")
 
     num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
-    cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
     if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
-        st.error("This tool does support mixing discrete and continuous variables - please use one type or the other exclusively.")
+        st.error("This tool does not support mixing discrete and continuous numerical variables - please use one type or the other exclusively.")
         st.stop()
+    
+    cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
     st.subheader("Objectives")
     
