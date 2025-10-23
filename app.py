@@ -41,7 +41,7 @@ def create_categorical_fields(num_variables):
     variable_dict = {}
     for i in range(num_variables):
         variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. base treament')
-        variable_values = st.text_input(f"Variable {i + 1} name (comma-separated):", placeholder= "ground, unground")
+        variable_values = st.text_input(f"Variable {i + 1} categories (comma-separated):", placeholder= "ground, unground")
 
         values = [value.strip() for value in variable_values.split(',')]
 
@@ -53,8 +53,8 @@ def create_substance_fields(num_variables):
     variable_dict = {}
     for i in range(num_variables):
         variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. solvent')
-        variable_values = st.text_input(f"Variable {i + 1} name (comma-separated):", placeholder= "methanol, ethanol, etc.")
-        variable_smile_values = st.text_input(f"Variable {i + 1} smile values (comma-separated):", placeholder= "CO, CCO, etc.")
+        variable_values = st.text_input(f"Variable {i + 1} names (comma-separated):", placeholder= "methanol, ethanol, etc.")
+        variable_smile_values = st.text_input(f"Variable {i + 1} SMILE strings (comma-separated):", placeholder= "CO, CCO, etc.")
 
         keys = [value.strip() for value in variable_values.split(',')]
         values = [value.strip() for value in variable_smile_values.split(',')]
@@ -67,7 +67,7 @@ def create_discrete_numerical_fields(num_numerical_variables):
     variable_dict = {}
     for i in range(num_numerical_variables):
         variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. temperature')
-        variable_values = st.text_input(f"Variable {i + 1} value (comma-separated):", placeholder= "40,60,80")
+        variable_values = st.text_input(f"Variable {i + 1} values (comma-separated):", placeholder= "40,60,80")
         values = [value.strip() for value in variable_values.split(',')]
 
         variable_dict[variable_name] = values
@@ -302,7 +302,7 @@ def main():
 
     campaign_previous = upload_file(key='Campaign JSON')
     
-    batch_reactions = st.number_input("Select **Number of reactions to suggest**", min_value= 1, value= 1, key = 'batch')
+    batch_reactions = st.number_input("Number of reactions to suggest", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
     
     reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
