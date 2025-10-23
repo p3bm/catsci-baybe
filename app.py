@@ -186,9 +186,9 @@ def main():
                     # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
 
     st.divider()
-    st.subheader("Create Reaction Scope")
+    st.subheader("Create Reaction Space")
     
-    if st.button("Create Scope"):
+    if st.button("Generate"):
         with st.spinner('Processing...'):                  
             campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
                                             disc_numerical_variables_dict, cont_numerical_variables_dict, 
