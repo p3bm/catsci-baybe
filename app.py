@@ -296,8 +296,10 @@ def main():
     batch_reactions = st.number_input("Select **Number of reactions to suggest**", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
 
-    if campaign_previous:
-        reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
+    if not campaign_previous:
+        st.stop()
+    
+    reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
     
     if st.button("Get recommendations"):
         if reactions is not None and new_campaign is not None:
