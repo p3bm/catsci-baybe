@@ -196,7 +196,7 @@ def main():
     st.divider()
     st.header("Recommend Reactions")
 
-    if not st.session_state.scope:
+    if st.session_state.scopeis None:
         campaign_previous = upload_file(key= 'Campaign JSON')
     else:
         campaign_previous = st.session_state.scope
