@@ -237,12 +237,16 @@ def main():
     
     num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
     objective_dict = create_objective_fields(num_objectives)
-    objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
-    vals = objective_weights.split(',')
-    weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
 
-    if num_objectives != len(weights):
-        st.error("Please make sure there are the same number of objectives as objective weights.")
+    if num_objectives > 1:
+        objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
+        vals = objective_weights.split(',')
+        weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
+    
+        if num_objectives != len(weights):
+            st.warning("Please make sure there are the same number of objectives as objective weights.")
+    else:
+        weights = None
 
     st.subheader("Select Recommenders")
     
