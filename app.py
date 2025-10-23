@@ -80,9 +80,9 @@ def create_continuous_numerical_fields(num_numerical_variables):
         variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
         bounds = [value.strip() for value in variable_values.split(',')]
         try:
-            bounds = (bounds[0],bounds[1])
+            bounds = (bounds[0], bounds[1])
         except IndexError:
-            None
+            bounds = (None, None)
         variable_dict[variable_name] = bounds
 
     for key in variable_dict:
