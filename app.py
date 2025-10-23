@@ -124,12 +124,12 @@ def main():
     st.title("Bayesian Reaction Optimizer")
 
     # Store the initial value of widgets in session state
+    st.session_state.scope = None
     if "visibility" not in st.session_state:
         st.session_state.visibility = "visible"
         st.session_state.disabled = False
-        st.session_state.scope = None
     
-    st.divider
+    st.divider()
     st.header("Create Scope")
     st.subheader("Categorical Variables")
 
