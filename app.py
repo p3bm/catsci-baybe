@@ -257,34 +257,32 @@ def main():
     second_recommender = st.selectbox(
         "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
         ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
-    
-    # initial_recommender = strategy_functions_first[initial_recomender]
-    # sequential_recommender = SequentialGreedyRecommender(
-    #     surrogate_model=strategy_functions_second[second_recomender],
-    #     acquisition_function_cls=ACQ_FUNCTION)
-        
-    try:
-        strategy = TwoPhaseMetaRecommender(
-                        initial_recommender= strategy_functions_first[initial_recommender],
-                        recommender=SequentialGreedyRecommender(
-                            surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
-                        ),)
-                        # allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
-                        # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
-    except NotImplementedError:
-        strategy = SequentialGreedyRecommender(
-            surrogate_model=strategy_functions_second[second_recommender],
-            acquisition_function=ACQ_FUNCTION
-        )
 
     st.divider()
     st.header("Create Reaction Space")
 
     if st.button("Generate"):
-        with st.spinner('Processing...'):                  
-            campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                            objective_dict, strategy, weights)
+        with st.spinner('Processing...'):
+            try:
+                strategy = TwoPhaseMetaRecommender(
+                    initial_recommender= strategy_functions_first[initial_recommender],
+                    recommender=SequentialGreedyRecommender(
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                    ),)
+
+                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                                objective_dict, strategy, weights)
+            except NotImplementedError:
+                strategy = SequentialGreedyRecommender(
+                    surrogate_model=strategy_functions_second[second_recommender],
+                    acquisition_function=ACQ_FUNCTION
+                )
+
+                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                                objective_dict, strategy, weights)
+            
             st.session_state.scope = campaign_json
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
