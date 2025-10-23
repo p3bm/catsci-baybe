@@ -130,7 +130,7 @@ def main():
         st.session_state.disabled = False
     
     st.divider()
-    st.header("Create Scope")
+    st.header("Outline Parameters and Objective(s)")
     st.subheader("Categorical Variables")
 
     num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
@@ -186,8 +186,8 @@ def main():
                     # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
 
     st.divider()
-    st.subheader("Create Reaction Space")
-    
+    st.header("Create Reaction Space")
+
     if st.button("Generate"):
         with st.spinner('Processing...'):                  
             campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
