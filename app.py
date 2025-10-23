@@ -114,98 +114,103 @@ def upload_file(key):
 
 
 def recommend_input():
-    past_recommendation = st.checkbox('Do you have previous recommended reactions data')
+    past_recommendation = st.toggle('Include existing reaction data')
     if past_recommendation:
-        df = upload_file(key= 'Reactions data CSV')
+        df = upload_file(key='Reactions data CSV')
         return df
         
 
 def main():
     st.title("Bayesian Reaction Optimizer")
-    tab1, tab2 = st.tabs(["Create Scope", "Optimize"])
 
     # Store the initial value of widgets in session state
     if "visibility" not in st.session_state:
         st.session_state.visibility = "visible"
         st.session_state.disabled = False
+        st.session_state.scope = None
+    
+    st.divider
+    st.header("Create Scope")
+    st.subheader("Categorical Variables")
 
-    with tab1:
-        st.subheader("Categorical Variables")
+    num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
+    categorical_variables_dict = create_categorical_fields(num_categorical_variables)
 
-        num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
-        categorical_variables_dict = create_categorical_fields(num_categorical_variables)
+    st.subheader("Substance Variables")
 
-        st.subheader("Substance Variables")
+    num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
+    substance_variables_dict = create_substance_fields(num_sub_variables)
 
-        num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
-        substance_variables_dict = create_substance_fields(num_sub_variables)
-
-        st.subheader("Discrete Numerical Variables")
-            
-        num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
-        disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
-
-        st.subheader("Continuous Numerical Variables")
-
-        num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
-        cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
-
-        st.subheader("Objectives")
+    st.subheader("Discrete Numerical Variables")
         
-        num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
-        objective_dict = create_objective_fields(num_objectives)
-        objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
-        vals = objective_weights.split(',')
-        weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
+    num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
+    disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
 
-        if num_objectives != len(weights):
-            st.error("Please make sure there are the same number of objectives as objective weights.")
+    st.subheader("Continuous Numerical Variables")
 
-        st.subheader("Select Recommenders")
-        
-        initial_recommender = st.selectbox(
-            'Select a stratgey to use for the initial recommendations:',
-            ('Random', 'Farthest Point Sampling', 'KMEANS Clustering'))
-        
-        second_recommender = st.selectbox(
-            "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
-            ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
-        
-        # initial_recommender = strategy_functions_first[initial_recomender]
-        # sequential_recommender = SequentialGreedyRecommender(
-        #     surrogate_model=strategy_functions_second[second_recomender],
-        #     acquisition_function_cls=ACQ_FUNCTION)
-            
-        strategy = TwoPhaseMetaRecommender(
-                        initial_recommender= strategy_functions_first[initial_recommender],
-                        recommender=SequentialGreedyRecommender(
-                            surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
-                        ),)
-                        # allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
-                        # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
+    num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
+    cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
-        if st.button('Create Scope'):
-            with st.spinner('Processing...'):                  
-                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                                objective_dict, strategy, weights)
-                st.download_button("Download", campaign_json, file_name= 'campaign.json')
+    st.subheader("Objectives")
+    
+    num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
+    objective_dict = create_objective_fields(num_objectives)
+    objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
+    vals = objective_weights.split(',')
+    weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
+
+    if num_objectives != len(weights):
+        st.error("Please make sure there are the same number of objectives as objective weights.")
+
+    st.subheader("Select Recommenders")
+    
+    initial_recommender = st.selectbox(
+        'Select a stratgey to use for the initial recommendations:',
+        ('Random', 'Farthest Point Sampling', 'KMEANS Clustering'))
+    
+    second_recommender = st.selectbox(
+        "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
+        ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
+    
+    # initial_recommender = strategy_functions_first[initial_recomender]
+    # sequential_recommender = SequentialGreedyRecommender(
+    #     surrogate_model=strategy_functions_second[second_recomender],
+    #     acquisition_function_cls=ACQ_FUNCTION)
         
-    with tab2:
-        st.header("Recommend Reactions")
+    strategy = TwoPhaseMetaRecommender(
+                    initial_recommender= strategy_functions_first[initial_recommender],
+                    recommender=SequentialGreedyRecommender(
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                    ),)
+                    # allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
+                    # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
+
+    if st.button('Create Reaction Scope'):
+        with st.spinner('Processing...'):                  
+            campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                            objective_dict, strategy, weights)
+            st.session_state.scope = campaign_json
+            st.download_button("Download", campaign_json, file_name= 'campaign.json')
+
+    st.divider()
+    st.header("Recommend Reactions")
+
+    if not st.session_state.scope:
         campaign_previous = upload_file(key= 'Campaign JSON')
-        batch_reactions = st.number_input("Select **batch size**", min_value= 1, value= 1, key = 'batch')
-        df = recommend_input()
-        reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
-        if st.button("Get recommendations"):
-            if reactions is not None and new_campaign is not None:
-                st.data_editor(reactions)
-                st.download_button("Download JSON file", new_campaign, file_name= "campaign.json")
-                # st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-                # st.write(reactions)
-
-        # if new_campaign is not None:
-        #     st.json(new_campaign)
+    else:
+        campaign_previous = st.session_state.scope
+    
+    batch_reactions = st.number_input("Select **batch size**", min_value= 1, value= 1, key = 'batch')
+    df = recommend_input()
+    reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
+    
+    if st.button("Get recommendations"):
+        if reactions is not None and new_campaign is not None:
+            st.data_editor(reactions)
+            st.download_button("Download JSON file", new_campaign, file_name= "campaign.json")
+            st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
+            # st.write(reactions)
 
 
 
