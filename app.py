@@ -145,7 +145,7 @@ def main():
             num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
             cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
-        st.divider(*, width="stretch")
+        st.divider()
         
         num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
         objective_dict = create_objective_fields(num_objectives)
