@@ -126,7 +126,7 @@ def recommend_input():
         
 
 def main():
-    st.set_page_config(page_title=None, page_icon="⚙", layout="wide")
+    st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
     
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
@@ -222,56 +222,61 @@ def main():
     st.divider()
     st.header("Outline Parameters and Objective(s)")
     
-    with st.container(border=True):
+    with st.container(border=True, key=cat_vars):
         st.subheader("Categorical Variables")
         
         num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
         categorical_variables_dict = create_categorical_fields(num_categorical_variables)
 
-    st.subheader("Substance Variables")
+    with st.container(border=True, key=sub_vars):
+        st.subheader("Substance Variables")
+    
+        num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
+        substance_variables_dict = create_substance_fields(num_sub_variables)
 
-    num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
-    substance_variables_dict = create_substance_fields(num_sub_variables)
+    with st.container(border=True, key=disc_num_vars):
+        st.subheader("Discrete Numerical Variables")
+            
+        num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
+        disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
 
-    st.subheader("Discrete Numerical Variables")
+    with st.container(border=True, key=cont_num_vars):
+        st.subheader("Continuous Numerical Variables")
+    
+        num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
+    
+        if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
+            st.error("This tool does not support mixing discrete and continuous numerical variables - please use one type or the other exclusively.")
+            st.stop()
         
-    num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
-    disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
+        cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
-    st.subheader("Continuous Numerical Variables")
-
-    num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
-
-    if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
-        st.error("This tool does not support mixing discrete and continuous numerical variables - please use one type or the other exclusively.")
-        st.stop()
+    with st.container(border=True, key=objs):
+        st.subheader("Objectives")
+        
+        num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
+        objective_dict = create_objective_fields(num_objectives)
     
-    cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
+        if num_objectives > 1:
+            objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
+            vals = objective_weights.split(',')
+            weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
+        
+            if num_objectives != len(weights):
+                st.warning("Please make sure there are the same number of objectives as objective weights.")
+        else:
+            weights = None
 
-    st.subheader("Objectives")
-    
-    num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
-    objective_dict = create_objective_fields(num_objectives)
-
-    if num_objectives > 1:
-        objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
-        vals = objective_weights.split(',')
-        weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
-    
-        if num_objectives != len(weights):
-            st.warning("Please make sure there are the same number of objectives as objective weights.")
-    else:
-        weights = None
-
-    st.subheader("Select Recommenders")
-    
-    initial_recommender = st.selectbox(
-        'Select a stratgey to use for the initial recommendations:',
-        ('Random', 'Farthest Point Sampling', 'KMEANS Clustering'))
-    
-    second_recommender = st.selectbox(
-        "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
-        ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
+    with st.container(border=True, key=recomms):
+        st.subheader("Select Recommenders")
+        
+        initial_recommender = st.selectbox(
+            'Select a stratgey to use for the initial recommendations:',
+            ('Random', 'Farthest Point Sampling', 'KMEANS Clustering'))
+        
+        second_recommender = st.selectbox(
+            "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
+            ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
     strategy = TwoPhaseMetaRecommender(
                     initial_recommender= strategy_functions_first[initial_recommender],
