@@ -39,9 +39,21 @@ strategy_functions_second = {
 def create_categorical_fields(num_variables):
     variable_dict = {}
     for i in range(num_variables):
-        variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'Solvent')
-        variable_values = st.text_input(f"Variable {i + 1} name (comma-separated):", placeholder= "DMAc")
-        variable_smile_values = st.text_input(f"Variable {i + 1} smile values (comma-separated):", placeholder= "CC(N(C)C)=O")
+        variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. base treament')
+        variable_values = st.text_input(f"Variable {i + 1} name (comma-separated):", placeholder= "ground, unground")
+
+        values = [value.strip() for value in variable_values.split(',')]
+
+        variable_dict[variable_name] = values
+    # st.write(variable_dict)
+    return variable_dict
+
+def create_substance_fields(num_variables):
+    variable_dict = {}
+    for i in range(num_variables):
+        variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. solvent')
+        variable_values = st.text_input(f"Variable {i + 1} name (comma-separated):", placeholder= "methanol, ethanol, etc.")
+        variable_smile_values = st.text_input(f"Variable {i + 1} smile values (comma-separated):", placeholder= "CO, CCO, etc.")
 
         keys = [value.strip() for value in variable_values.split(',')]
         values = [value.strip() for value in variable_smile_values.split(',')]
@@ -50,17 +62,28 @@ def create_categorical_fields(num_variables):
     # st.write(variable_dict)
     return variable_dict
 
-
-def create_numerical_fields(num_numerical_variables):
+def create_discrete_numerical_fields(num_numerical_variables):
     variable_dict = {}
     for i in range(num_numerical_variables):
-        variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'Temperature')
-        variable_values = st.text_input(f"Variable {i + 1} value (comma-separated):", placeholder= "90,105,120")
+        variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. temperature')
+        variable_values = st.text_input(f"Variable {i + 1} value (comma-separated):", placeholder= "40,60,80")
         values = [value.strip() for value in variable_values.split(',')]
 
         variable_dict[variable_name] = values
     return variable_dict
 
+def create_continuous_numerical_fields(num_numerical_variables):
+    variable_dict = {}
+    for i in range(num_numerical_variables):
+        variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
+        variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
+        bounds = (value.strip() for value in variable_values.split(','))
+
+        if len(bounds) > 2:
+            st.error("The continuous categorical variable requires only lower and upper bound values.)
+
+        variable_dict[variable_name] = bounds
+    return variable_dict
 
 def create_objective_fields(num_objective_variables):
     objective_dict = {}
