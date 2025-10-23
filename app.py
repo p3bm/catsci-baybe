@@ -259,10 +259,7 @@ def main():
         ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
     if (num_disc_numerical_variables > 0) and (num_cont_numerical_variables > 0):
-        strategy = SequentialGreedyRecommender(
-                    surrogate_model=strategy_functions_second[second_recommender],
-                    acquisition_function=ACQ_FUNCTION
-                )
+        st.error("This tool does support mixing discrete and continuous variables - please use one type or the other exclusively.")
     else: 
         strategy = TwoPhaseMetaRecommender(
                         initial_recommender= strategy_functions_first[initial_recommender],
