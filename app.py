@@ -83,7 +83,10 @@ def create_continuous_numerical_fields(num_numerical_variables):
         if len(bounds) > 2:
             st.error("The continuous categorical variable requires only lower and upper bound values.")
 
-        bounds = (bounds[0],bounds[1])
+        try:
+            bounds = (bounds[0],bounds[1])
+        except IndexError:
+            st.stop()
         variable_dict[variable_name] = bounds
     return variable_dict
 
