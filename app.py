@@ -125,7 +125,7 @@ def main():
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
 
-    with st.expander("User Guide: How to Use the Bayesian Reaction Optimizer"):
+    with st.expander("User Guide"):
         st.markdown("""
             ### **Overview**
             This tool helps you **design and optimize chemical reactions** using Bayesian Optimization via **BayBE**.  
