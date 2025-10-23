@@ -124,93 +124,93 @@ def main():
     st.title("Bayesian Reaction Optimizer")
 
     with st.expander("📘 User Guide: How to Use the Bayesian Reaction Optimizer"):
-    st.markdown("""
-    ### 🧪 **Overview**
-    This tool helps you **design and optimize chemical reactions** using Bayesian Optimization via **BayBE**.  
-    It suggests which experiments to run next to improve one or more objectives — for example, yield or selectivity.
-    
-    ---
-    
-    ### **1️⃣ Define Your Variables**
-    Describe all the factors that define your reaction space:
-    
-    - **Categorical variables** – qualitative choices (e.g., *base treatment*: ground, unground).  
-    - **Substance variables** – chemical components with SMILES strings (e.g., *solvent*: ethanol → `CCO`).  
-    - **Discrete numerical variables** – numeric values with fixed options (e.g., *temperature*: 40, 60, 80).  
-    - **Continuous numerical variables** – numeric ranges (e.g., *equivalents*: 0.8, 2.0).  
-    
-    💡 *Tip:* Use “discrete” for small fixed sets, and “continuous” for ranges where exploration is desired.
-    
-    ---
-    
-    ### **2️⃣ Define Your Objective(s)**
-    Specify what you want to optimize.
-    
-    - Example:  
-      - Objective: **Yield**, mode: `max`  
-      - Objective: **Selectivity**, mode: `max`
-    - Assign **weights** if optimizing multiple objectives (e.g., `70,30`).
-    
-    ⚠️ The number of weights must match the number of objectives.
-    
-    ---
-    
-    ### **3️⃣ Choose Recommender Strategy**
-    You’ll pick two recommenders that guide the optimization process:
-    
-    - **Initial recommender** *(used before any data exists)*:
-      - `Random` – Picks random conditions (pure exploration).  
-      - `Farthest Point Sampling` – Picks conditions far apart to cover the space evenly.  
-      - `KMEANS Clustering` – Picks representative, evenly distributed conditions.
-    
-    - **Surrogate recommender** *(used after data is available)*:
-      - `Gaussian Process` – Smooth model, good for continuous variables.  
-      - `Random Forest` – Robust and fast, works well with mixed variable types.  
-      - `NGBoost` – Flexible model for complex relationships.  
-      - `Bayesian Linear` – Simple, effective for small datasets.
-    
-    ---
-    
-    ### **4️⃣ Generate the Campaign**
-    Once inputs are ready:
-    1. Click **“Generate”** to create your optimization campaign.  
-    2. Download the resulting **`campaign.json`** file to save your setup.
-    
-    ---
-    
-    ### **5️⃣ Add Experimental Data (Optional)**
-    If you’ve already run experiments:
-    1. Toggle **“Include existing reaction data.”**  
-    2. Upload your results as a `.csv` file.  
-       - Columns must match your variable and objective names.  
-    3. The optimizer will use these results to improve its model.
-    
-    ---
-    
-    ### **6️⃣ Get New Recommendations**
-    1. Set the **batch size** (number of new experiments to suggest).  
-    2. Click **“Get recommendations.”**  
-    3. View, edit, and download:
-       - Suggested experiments as **`reactions.csv`**  
-       - Updated campaign file as **`campaign.json`**
-    
-    ---
-    
-    ### **7️⃣ Iterative Optimization**
-    After each batch of experiments:
-    1. Add new results to your data file.  
-    2. Upload the updated `.csv` and `.json`.  
-    3. Request new recommendations.  
-    Repeat until your objectives stop improving.
-    
-    ---
-    
-    ### ✅ **Tips for Best Results**
-    - Start with **Farthest Point Sampling** for good initial coverage.  
-    - Use **Gaussian Process** for fine-tuning after data collection.  
-    - Keep all units and objective values consistent.  
-    - Avoid duplicate or missing variable names across inputs.
-    """)
+        st.markdown("""
+            ### 🧪 **Overview**
+            This tool helps you **design and optimize chemical reactions** using Bayesian Optimization via **BayBE**.  
+            It suggests which experiments to run next to improve one or more objectives — for example, yield or selectivity.
+            
+            ---
+            
+            ### **1️⃣ Define Your Variables**
+            Describe all the factors that define your reaction space:
+            
+            - **Categorical variables** – qualitative choices (e.g., *base treatment*: ground, unground).  
+            - **Substance variables** – chemical components with SMILES strings (e.g., *solvent*: ethanol → `CCO`).  
+            - **Discrete numerical variables** – numeric values with fixed options (e.g., *temperature*: 40, 60, 80).  
+            - **Continuous numerical variables** – numeric ranges (e.g., *equivalents*: 0.8, 2.0).  
+            
+            💡 *Tip:* Use “discrete” for small fixed sets, and “continuous” for ranges where exploration is desired.
+            
+            ---
+            
+            ### **2️⃣ Define Your Objective(s)**
+            Specify what you want to optimize.
+            
+            - Example:  
+              - Objective: **Yield**, mode: `max`  
+              - Objective: **Selectivity**, mode: `max`
+            - Assign **weights** if optimizing multiple objectives (e.g., `70,30`).
+            
+            ⚠️ The number of weights must match the number of objectives.
+            
+            ---
+            
+            ### **3️⃣ Choose Recommender Strategy**
+            You’ll pick two recommenders that guide the optimization process:
+            
+            - **Initial recommender** *(used before any data exists)*:
+              - `Random` – Picks random conditions (pure exploration).  
+              - `Farthest Point Sampling` – Picks conditions far apart to cover the space evenly.  
+              - `KMEANS Clustering` – Picks representative, evenly distributed conditions.
+            
+            - **Surrogate recommender** *(used after data is available)*:
+              - `Gaussian Process` – Smooth model, good for continuous variables.  
+              - `Random Forest` – Robust and fast, works well with mixed variable types.  
+              - `NGBoost` – Flexible model for complex relationships.  
+              - `Bayesian Linear` – Simple, effective for small datasets.
+            
+            ---
+            
+            ### **4️⃣ Generate the Campaign**
+            Once inputs are ready:
+            1. Click **“Generate”** to create your optimization campaign.  
+            2. Download the resulting **`campaign.json`** file to save your setup.
+            
+            ---
+            
+            ### **5️⃣ Add Experimental Data (Optional)**
+            If you’ve already run experiments:
+            1. Toggle **“Include existing reaction data.”**  
+            2. Upload your results as a `.csv` file.  
+               - Columns must match your variable and objective names.  
+            3. The optimizer will use these results to improve its model.
+            
+            ---
+            
+            ### **6️⃣ Get New Recommendations**
+            1. Set the **batch size** (number of new experiments to suggest).  
+            2. Click **“Get recommendations.”**  
+            3. View, edit, and download:
+               - Suggested experiments as **`reactions.csv`**  
+               - Updated campaign file as **`campaign.json`**
+            
+            ---
+            
+            ### **7️⃣ Iterative Optimization**
+            After each batch of experiments:
+            1. Add new results to your data file.  
+            2. Upload the updated `.csv` and `.json`.  
+            3. Request new recommendations.  
+            Repeat until your objectives stop improving.
+            
+            ---
+            
+            ### ✅ **Tips for Best Results**
+            - Start with **Farthest Point Sampling** for good initial coverage.  
+            - Use **Gaussian Process** for fine-tuning after data collection.  
+            - Keep all units and objective values consistent.  
+            - Avoid duplicate or missing variable names across inputs.
+            """)
 
     # Store the initial value of widgets in session state
     st.session_state.scope = None
