@@ -126,6 +126,8 @@ def recommend_input():
         
 
 def main():
+    st.set_page_config(page_title=None, page_icon="⚙", layout="wide")
+    
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
 
@@ -219,10 +221,12 @@ def main():
     
     st.divider()
     st.header("Outline Parameters and Objective(s)")
-    st.subheader("Categorical Variables")
-
-    num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
-    categorical_variables_dict = create_categorical_fields(num_categorical_variables)
+    
+    with st.container(border=True):
+        st.subheader("Categorical Variables")
+        
+        num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
+        categorical_variables_dict = create_categorical_fields(num_categorical_variables)
 
     st.subheader("Substance Variables")
 
