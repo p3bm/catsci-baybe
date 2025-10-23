@@ -77,11 +77,12 @@ def create_continuous_numerical_fields(num_numerical_variables):
     for i in range(num_numerical_variables):
         variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
         variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
-        bounds = (value.strip() for value in variable_values.split(','))
+        bounds = [value.strip() for value in variable_values.split(',')]
 
         if len(bounds) > 2:
             st.error("The continuous categorical variable requires only lower and upper bound values.")
 
+        bounds = (bounds[0],bounds[1])
         variable_dict[variable_name] = bounds
     return variable_dict
 
