@@ -104,18 +104,24 @@ def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_d
     return parameters, objectives
 
 
-def create_campaign(categorical_variables_dict, numerical_variables_dict, objective_dict, strategy, weights):
+def create_campaign(categorical_variables_dict, substance_variables_dict, 
+                    disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                    objective_dict, strategy, weights):
     """_summary_
 
     Args:
         categorical_variables_dict (_type_): _description_
-        numerical_variables_dict (_type_): _description_
+        substance_variables_dict (_type_): _description_
+        disc_numerical_variables_dict (_type_): _description_
+        cont_numerical_variables_dict (_type_): _description_
         objective_dict (_type_): _description_
 
     Returns:
         _type_: _description_
     """
-    parameters, objectives = convert_params(categorical_variables_dict, numerical_variables_dict, objective_dict)
+    parameters, objectives = convert_params(categorical_variables_dict, substance_variables_dict, 
+                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                            objective_dict)
     searchspace = SearchSpace.from_product(parameters=parameters)
     if len(objectives) > 1:
         # mode = "DESIRABILITY"
