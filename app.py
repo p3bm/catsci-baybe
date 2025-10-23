@@ -126,7 +126,7 @@ def recommend_input():
         
 
 def main():
-    st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
+    #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
     
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
