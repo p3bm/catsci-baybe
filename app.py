@@ -258,32 +258,30 @@ def main():
         "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
         ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
+    if (num_disc_numerical_variables > 0) and (num_cont_numerical_values > 0):
+        strategy = SequentialGreedyRecommender(
+                    surrogate_model=strategy_functions_second[second_recommender],
+                    acquisition_function=ACQ_FUNCTION
+                )
+    else: 
+        strategy = TwoPhaseMetaRecommender(
+                        initial_recommender= strategy_functions_first[initial_recommender],
+                        recommender=SequentialGreedyRecommender(
+                            surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                        ),)
+    
     st.divider()
     st.header("Create Reaction Space")
 
     if st.button("Generate"):
         with st.spinner('Processing...'):
-            try:
-                strategy = TwoPhaseMetaRecommender(
-                    initial_recommender= strategy_functions_first[initial_recommender],
-                    recommender=SequentialGreedyRecommender(
-                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
-                    ),)
-
-                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                                objective_dict, strategy, weights)
-            except NotImplementedError:
-                strategy = SequentialGreedyRecommender(
-                    surrogate_model=strategy_functions_second[second_recommender],
-                    acquisition_function=ACQ_FUNCTION
-                )
-
-                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                                objective_dict, strategy, weights)
+            
+            campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                            objective_dict, strategy, weights)
             
             st.session_state.scope = campaign_json
+            
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
 
