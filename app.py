@@ -134,24 +134,35 @@ def main():
         with col1:
             num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
             categorical_variables_dict = create_categorical_fields(num_categorical_variables)
-        with col2:
-            num_numerical_variables = st.number_input("How many **numerical** variables do you have?", min_value=0, value=0, key = 'num')
-            numerical_variables_dict = create_numerical_fields(num_numerical_variables)
 
+            num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
+            substance_variables_dict = create_substance_fields(num_sub_variables)
+            
+        with col2:
+            num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
+            disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
+
+            num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
+            cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
+
+        st.divider(*, width="stretch")
+        
         num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
         objective_dict = create_objective_fields(num_objectives)
         objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
         vals = objective_weights.split(',')
         weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
 
+        if num_objectives != len(weights):
+            st.error("Please make sure there are the same number of objectives as objective weights.")
         
         initial_recommender = st.selectbox(
-            'For the first recommendation, which strategy to use?',
+            'Select a stratgey to use for the initial recommendations:',
             ('Random', 'Farthest Point Sampling', 'KMEANS Clustering'))
         
         second_recommender = st.selectbox(
-            "For the second recommendation, which strategy to use?",
-            ("Gaussian Process", "Random Forest","NGBoost","Bayesian Linear"))
+            "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
+            ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
         
         # initial_recommender = strategy_functions_first[initial_recomender]
         # sequential_recommender = SequentialGreedyRecommender(
@@ -167,8 +178,10 @@ def main():
                         # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
 
         if st.button('Create Scope'):
-            with st.spinner('Wait for it...'):                  
-                campaign_json = create_campaign(categorical_variables_dict, numerical_variables_dict, objective_dict, strategy, weights)
+            with st.spinner('Processing...'):                  
+                campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                                objective_dict, strategy, weights)
                 st.download_button("Download", campaign_json, file_name= 'campaign.json')
         
     with tab2:
