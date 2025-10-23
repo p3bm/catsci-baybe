@@ -148,6 +148,7 @@ def main():
             The mode can be set to `max` or `min` to maimise or minimise the chosen objective as required.
             If multiple objectives are used, the weighting of the importance of each objective can be specified.
             Make sure there are the same number of weights as objectives!
+            Note: the objectives currently expect values within the bounds 0-100.
             
             ---
             
