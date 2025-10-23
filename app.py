@@ -222,25 +222,25 @@ def main():
     st.divider()
     st.header("Outline Parameters and Objective(s)")
     
-    with st.container(border=True, key=cat_vars):
+    with st.container(border=True, key="cat_vars"):
         st.subheader("Categorical Variables")
         
         num_categorical_variables = st.number_input("How many **categorical** variables do you have?", min_value=0, value=0, key = 'cat')
         categorical_variables_dict = create_categorical_fields(num_categorical_variables)
 
-    with st.container(border=True, key=sub_vars):
+    with st.container(border=True, key="sub_vars"):
         st.subheader("Substance Variables")
     
         num_sub_variables = st.number_input("How many **substance-type categorical** variables do you have?", min_value=0, value=0, key = 'sub')
         substance_variables_dict = create_substance_fields(num_sub_variables)
 
-    with st.container(border=True, key=disc_num_vars):
+    with st.container(border=True, key="disc_num_vars"):
         st.subheader("Discrete Numerical Variables")
             
         num_disc_numerical_variables = st.number_input("How many **discrete numerical** variables do you have?", min_value=0, value=0, key = 'num_disc')
         disc_numerical_variables_dict = create_discrete_numerical_fields(num_disc_numerical_variables)
 
-    with st.container(border=True, key=cont_num_vars):
+    with st.container(border=True, key="cont_num_vars"):
         st.subheader("Continuous Numerical Variables")
     
         num_cont_numerical_variables = st.number_input("How many **continuous numerical** variables do you have?", min_value=0, value=0, key = 'num_cont')
@@ -251,7 +251,7 @@ def main():
         
         cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
-    with st.container(border=True, key=objs):
+    with st.container(border=True, key="objs"):
         st.subheader("Objectives")
         
         num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
@@ -267,7 +267,7 @@ def main():
         else:
             weights = None
 
-    with st.container(border=True, key=recomms):
+    with st.container(border=True, key="recomms"):
         st.subheader("Select Recommenders")
         
         initial_recommender = st.selectbox(
