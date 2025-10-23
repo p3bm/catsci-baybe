@@ -8,14 +8,14 @@ import streamlit as st
 import pandas as pd
 import json
 
-def convert_substance_variable(cat_dict, name):
+def convert_substance_variable(sub_dict, name):
     """_summary_
 
     Args:
         cat_dict (_type_): _description_
         name (_type_): _description_
     """
-    return SubstanceParameter(name, data=cat_dict, encoding="MORDRED")
+    return SubstanceParameter(name, data=sub_dict, encoding="MORDRED")
 
 
 
