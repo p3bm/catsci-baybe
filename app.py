@@ -263,13 +263,19 @@ def main():
     #     surrogate_model=strategy_functions_second[second_recomender],
     #     acquisition_function_cls=ACQ_FUNCTION)
         
-    strategy = TwoPhaseMetaRecommender(
-                    initial_recommender= strategy_functions_first[initial_recommender],
-                    recommender=SequentialGreedyRecommender(
-                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
-                    ),)
-                    # allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
-                    # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
+    try:
+        strategy = TwoPhaseMetaRecommender(
+                        initial_recommender= strategy_functions_first[initial_recommender],
+                        recommender=SequentialGreedyRecommender(
+                            surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                        ),)
+                        # allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
+                        # allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED)
+    except NotImplementedError:
+        strategy = SequentialGreedyRecommender(
+            surrogate_model=strategy_functions_second[second_recommender],
+            acquisition_function=ACQ_FUNCTION
+        )
 
     st.divider()
     st.header("Create Reaction Space")
@@ -281,7 +287,7 @@ def main():
                                             objective_dict, strategy, weights)
             st.session_state.scope = campaign_json
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            st.download_button("Download", campaign_json, file_name= f'{now}_campaign.json')
+            st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
 
     st.divider()
     st.header("Recommend Reactions")
@@ -303,6 +309,9 @@ def main():
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
             st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
+
+    if st.button("Update locally stored reaction scope for this session"):
+        st.session_state.scope = new_campaign
 
 if __name__ == "__main__":
     main()
