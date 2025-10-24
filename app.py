@@ -116,13 +116,20 @@ def upload_file(key):
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'csv':
         df = pd.read_csv(uploaded_files)
         return df
-
+        
 
 def recommend_input():
     past_recommendation = st.toggle('Include existing reaction data')
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
         return df
+
+def show_stats(campaign,recommendations):
+    campaign_recreate = Campaign.from_json(campaign)
+    campaign_json = json.loads(campaign)
+    st.write(campaign_json.measurements)
+    st.table(campaign_json.posterior_stats(recommendations))
+    return None
 
 def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
@@ -307,7 +314,6 @@ def main():
     st.header("Recommend Reactions")
 
     campaign_previous = upload_file(key='Campaign JSON')
-    st.write(campaign_previous.measurements)
     
     batch_reactions = st.number_input("Number of reactions to suggest", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
@@ -322,6 +328,7 @@ def main():
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
         st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
+        show_stats(new_campaign,reactions)
 
 if __name__ == "__main__":
     main()
