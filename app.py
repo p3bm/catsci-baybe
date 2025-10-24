@@ -124,16 +124,6 @@ def recommend_input():
         df = upload_file(key='Reactions data CSV')
         return df
 
-def get_stats(campaign,rec):
-    stats = campaign.posterior_stats(rec)
-    st.table(stats)
-    return None
-
-def plot_measurements(campaign):
-    measurements = campaign.measurements
-    st.write(measurements)
-    return None
-
 def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
     
@@ -317,6 +307,7 @@ def main():
     st.header("Recommend Reactions")
 
     campaign_previous = upload_file(key='Campaign JSON')
+    st.write(campaign_previous.measurements)
     
     batch_reactions = st.number_input("Number of reactions to suggest", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
@@ -331,12 +322,6 @@ def main():
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
         st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-
-        if st.toggle("Display posterior statistics", key="stat_toggle"):
-            get_stats(campaign_previous, reactions)
-
-        if st.toggle("Display learning curve", key="toggle_learning_curve"):
-            plot_measurements(campaign_previous)
 
 if __name__ == "__main__":
     main()
