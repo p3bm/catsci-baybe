@@ -181,21 +181,22 @@ def main():
             
             ---
             
-            ### **5️⃣ Add Experimental Data (Optional)**
+            ### **5️⃣ Get New Recommendations**
+            1. Upload your latest **`*_campaign.json`** file.
+            2. Set the **number of new experiments to suggest**.  
+            3. Click **“Get recommendations.”**  
+            4. View, edit, and download:
+               - Suggested experiments as **`reactions.csv`**  
+               - Updated campaign file as **`*_campaign.json`**
+            
+            ---
+
+            ### **6️⃣ Add Experimental Data (Optional)**
             If you’ve already run experiments:
             1. Toggle **“Include existing reaction data.”**  
             2. Upload your results as a `.csv` file.  
                - Columns must match your variable and objective names.  
             3. The optimizer will use these results to improve its model.
-            
-            ---
-            
-            ### **6️⃣ Get New Recommendations**
-            1. Set the **batch size** (number of new experiments to suggest).  
-            2. Click **“Get recommendations.”**  
-            3. View, edit, and download:
-               - Suggested experiments as **`reactions.csv`**  
-               - Updated campaign file as **`*_campaign.json`**
             
             ---
             
