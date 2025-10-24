@@ -222,12 +222,13 @@ def main():
             """)
 
     # Store the initial value of widgets in session state
-    st.session_state.scope = None
-    st.session_state.campaign_generated = False
-    st.session_state.recommendations_made = False
     if "visibility" not in st.session_state:
         st.session_state.visibility = "visible"
         st.session_state.disabled = False
+    if "campaign_generated" not in st.session_state:
+        st.session_state.campaign_generated = False
+    if "recommendations_made" not in st.session_state:
+        st.session_state.recommendations_made = False
     
     st.divider()
     st.header("Outline Parameters and Objective(s)")
