@@ -103,7 +103,6 @@ def create_objective_fields(num_objective_variables):
     # st.write(objective_dict)
     return objective_dict
 
-
 def upload_file(key):
     uploaded_files = st.file_uploader("Choose a " + key + " file", key = key)
     
@@ -116,18 +115,17 @@ def upload_file(key):
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'csv':
         df = pd.read_csv(uploaded_files)
         return df
-        
 
 def recommend_input():
     past_recommendation = st.toggle('Include existing reaction data')
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
         return df
-
+        
 def show_stats(campaign,recommendations):
     campaign_recreate = Campaign.from_json(campaign)
     campaign_json = json.loads(campaign)
-    st.write(campaign_json.measurements)
+    #st.write(campaign_json.measurements)
     st.table(campaign_json.posterior_stats(recommendations))
     return None
 
