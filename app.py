@@ -333,10 +333,10 @@ def main():
         st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
 
         if st.toggle("Display posterior statistics", key="stat_toggle"):
-            get_stats(new_campaign, reactions)
+            get_stats(campaign_previous, reactions)
 
         if st.toggle("Display learning curve", key="toggle_learning_curve"):
-            plot_measurements(new_campaign)
+            plot_measurements(campaign_previous)
 
 if __name__ == "__main__":
     main()
