@@ -324,7 +324,7 @@ def main():
             st.data_editor(st.session_state.reactions)
             st.session_state.recommendations_made = True
 
-    if st.session_state.recommendations_made:
+    if st.session_state.recommendations_made and "new_campaign" in st.session_state and "reactions" in st.session_state:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button("Download JSON file", st.session_state.new_campaign, file_name= f"{now}_{campaign_name}.json")
         st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
