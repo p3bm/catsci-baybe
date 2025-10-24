@@ -227,6 +227,9 @@ def main():
         st.session_state.recommendations_made = False
     
     st.divider()
+
+    campaign_name = st.text_input("Enter a campaign name", value="", key="campaign_name")
+    
     st.header("Outline Parameters and Objective(s)")
     
     with st.container(border=True, key="cat_vars"):
@@ -297,7 +300,7 @@ def main():
     if st.button("Generate"):
         with st.spinner('Processing...'):
             
-            campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+            st.session_state.campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
                                             disc_numerical_variables_dict, cont_numerical_variables_dict, 
                                             objective_dict, strategy, weights)
 
@@ -305,7 +308,7 @@ def main():
 
     if st.session_state.campaign_generated:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
+        st.download_button("Download campaign JSON", st.session_state.campaign_json, file_name= f'{now}_{campaign_name}.json')
 
     st.divider()
     st.header("Recommend Reactions")
@@ -316,16 +319,18 @@ def main():
     df = recommend_input()
     
     if st.button("Get recommendations"):
-        reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
-        if reactions is not None and new_campaign is not None:
-            st.data_editor(reactions)
+        st.session_state.reactions, st.session_state.new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
+        if st.session_state.reactions is not None and st.session_state.new_campaign is not None:
+            st.data_editor(st.session_state.reactions)
             st.session_state.recommendations_made = True
 
     if st.session_state.recommendations_made:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
-        st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-        #show_stats(new_campaign,reactions)
+        optimisation_round = st.session_state.
+        st.download_button("Download JSON file", st.session_state.new_campaign, file_name= f"{now}_{campaign_name}.json")
+        st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
+        if st.toggle("Show statistics"):
+            show_stats(st.session_state.new_campaign,st.session_state.reactions)
 
 if __name__ == "__main__":
     main()
