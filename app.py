@@ -325,7 +325,7 @@ def main():
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
         st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
-        show_stats(new_campaign,reactions)
+        #show_stats(new_campaign,reactions)
 
 if __name__ == "__main__":
     main()
