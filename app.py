@@ -316,13 +316,17 @@ def main():
     st.divider()
     st.header("Recommend Reactions")
 
-    campaign_previous = upload_file(key='Campaign JSON')
+    campaign_previous = upload_file(key='latest campaign JSON')
     
     batch_reactions = st.number_input("Number of reactions to suggest", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
     
     if st.button("Get recommendations"):
-        st.session_state.reactions, st.session_state.new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
+        try:
+            st.session_state.reactions, st.session_state.new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
+        except NotEnoughPointsLeftError:
+            st.error("The number of recommendations entered exceeds the number of parameter combinations left to explore!")
+            st.stop()
         if st.session_state.reactions is not None and st.session_state.new_campaign is not None:
             st.data_editor(st.session_state.reactions)
             st.session_state.recommendations_made = True
