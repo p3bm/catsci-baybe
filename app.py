@@ -124,10 +124,7 @@ def recommend_input():
         
 def show_stats(campaign,recommendations):
     campaign_recreate = Campaign.from_json(campaign)
-    try:
-        st.write(campaign_recreate.measurements)
-    except:
-        None
+    st.write(campaign_recreate.measurements)
     st.table(campaign_recreate.posterior_stats(recommendations))
     return None
 
