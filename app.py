@@ -124,13 +124,15 @@ def recommend_input():
         df = upload_file(key='Reactions data CSV')
         return df
 
-def get_stats(campaign):
+def get_stats(campaign,rec):
     stats = campaign.posterior_stats(rec)
     st.table(stats)
+    return None
 
 def plot_measurements(campaign):
     measurements = campaign.measurements
     st.write(measurements)
+    return None
 
 def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
@@ -319,9 +321,8 @@ def main():
     batch_reactions = st.number_input("Number of reactions to suggest", min_value= 1, value= 1, key = 'batch')
     df = recommend_input()
     
-    reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
-    
     if st.button("Get recommendations"):
+        reactions, new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
         if reactions is not None and new_campaign is not None:
             st.data_editor(reactions)
             st.session_state.recommendations_made = True
@@ -332,7 +333,7 @@ def main():
         st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
 
         if st.toggle("Display posterior statistics", key="stat_toggle"):
-            get_stats(new_campaign)
+            get_stats(new_campaign, reactions)
 
         if st.toggle("Display learning curve", key="toggle_learning_curve"):
             plot_measurements(new_campaign)
