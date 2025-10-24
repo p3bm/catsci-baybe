@@ -123,7 +123,14 @@ def recommend_input():
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
         return df
-        
+
+def get_stats(campaign):
+    stats = campaign.posterior_stats(rec)
+    st.table(stats)
+
+def plot_measurements(campaign):
+    measurements = campaign.measurements
+    st.write(measurements)
 
 def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
@@ -216,6 +223,8 @@ def main():
 
     # Store the initial value of widgets in session state
     st.session_state.scope = None
+    st.session_state.campaign_generated = False
+    st.session_state.recommendations_made = False
     if "visibility" not in st.session_state:
         st.session_state.visibility = "visible"
         st.session_state.disabled = False
@@ -294,9 +303,12 @@ def main():
             campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
                                             disc_numerical_variables_dict, cont_numerical_variables_dict, 
                                             objective_dict, strategy, weights)
-            
-            now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
+
+            st.session_state.campaign_generated = True
+
+    if st.session_state.campaign_generated:
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        st.download_button("Download campaign JSON", campaign_json, file_name= f'{now}_campaign.json')
 
     st.divider()
     st.header("Recommend Reactions")
@@ -311,9 +323,18 @@ def main():
     if st.button("Get recommendations"):
         if reactions is not None and new_campaign is not None:
             st.data_editor(reactions)
-            now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
-            st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
+            st.session_state.recommendations_made = True
+
+    if st.session_state.recommendations_made:
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        st.download_button("Download JSON file", new_campaign, file_name= f"{now}_campaign.json")
+        st.download_button("Download recommended reactions", reactions.to_csv().encode('utf-8'), file_name= 'reactions.csv', mime= 'text/csv')
+
+        if st.toggle("Display posterior statistics", key="stat_toggle"):
+            get_stats(new_campaign)
+
+        if st.toggle("Display learning curve", key="toggle_learning_curve"):
+            plot_measurements(new_campaign)
 
 if __name__ == "__main__":
     main()
