@@ -231,11 +231,6 @@ def main():
 
     campaign_name = st.text_input("Enter a campaign name", value="", key="campaign_name")
     
-    if st.toggle("Allow repeated recommendations", key="recommend repeats"):
-        ALLOW_REPEATED_RECOMMENDATIONS = True
-    if st.toggle("Allow recommending parameter combinations already tested", key="recommend already measured"):
-        ALLOW_RECOMMENDING_ALREADY_MEASURED = True
-    
     st.header("Outline Parameters and Objective(s)")
     
     with st.container(border=True, key="cat_vars"):
@@ -320,6 +315,11 @@ def main():
 
     st.divider()
     st.header("Recommend Reactions")
+
+    if st.toggle("Allow repeated recommendations", key="recommend repeats"):
+        ALLOW_REPEATED_RECOMMENDATIONS = True
+    if st.toggle("Allow recommending parameter combinations already tested", key="recommend already measured"):
+        ALLOW_RECOMMENDING_ALREADY_MEASURED = True
 
     campaign_previous = upload_file(key='latest campaign JSON')
     
