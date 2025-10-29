@@ -17,11 +17,6 @@ from io import StringIO
 import pandas as pd
 from datetime import datetime
 
-
-ACQ_FUNCTION = "qEI"
-ALLOW_REPEATED_RECOMMENDATIONS = False
-ALLOW_RECOMMENDING_ALREADY_MEASURED = False
-
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
     'Random': RandomRecommender(),
@@ -132,6 +127,10 @@ def show_stats(campaign,recommendations):
 
 def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
+
+    ACQ_FUNCTION = "qEI"
+    ALLOW_REPEATED_RECOMMENDATIONS = False
+    ALLOW_RECOMMENDING_ALREADY_MEASURED = False
     
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
