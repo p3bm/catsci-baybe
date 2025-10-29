@@ -19,9 +19,8 @@ from datetime import datetime
 
 
 ACQ_FUNCTION = "qEI"
-ALLOW_REPEATED_RECOMMENDATIONS = True
-ALLOW_RECOMMENDING_ALREADY_MEASURED = True
-
+ALLOW_REPEATED_RECOMMENDATIONS = False
+ALLOW_RECOMMENDING_ALREADY_MEASURED = False
 
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
@@ -232,6 +231,11 @@ def main():
     st.divider()
 
     campaign_name = st.text_input("Enter a campaign name", value="", key="campaign_name")
+    
+    if st.toggle("Allow repeated recommendations", key="recommend repeats"):
+        ALLOW_REPEATED_RECOMMENDATIONS = True
+    if st.toggle("Allow recommending parameter combinations already tested", key="recommend already measured"):
+        ALLOW_RECOMMENDING_ALREADY_MEASURED = True
     
     st.header("Outline Parameters and Objective(s)")
     
