@@ -270,7 +270,7 @@ def main():
     with st.container(border=True, key="objs"):
         st.subheader("Objectives")
         
-        num_objectives = st.number_input("How many **objective** variables do you have", min_value= 0, value= 0, key = 'obj')
+        num_objectives = st.number_input("How many **objective** variables do you have", min_value= 1, value= 1, key = 'obj')
         objective_dict = create_objective_fields(num_objectives)
     
         if num_objectives > 1:
