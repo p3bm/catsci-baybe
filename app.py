@@ -18,6 +18,7 @@ import json
 from io import StringIO
 import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
@@ -106,7 +107,6 @@ def upload_file(key):
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'json':
         stringio = StringIO(uploaded_files.getvalue().decode("utf-8"))
         data = stringio.read()
-
         return data
     
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'csv':
@@ -119,13 +119,19 @@ def recommend_input():
         df = upload_file(key='Reactions data CSV')
         return df
         
-def show_stats(campaign,recommendations):
+def plot_learning_curve(campaign,recommendations):
     campaign_recreate = Campaign.from_json(campaign)
-    st.write(campaign_recreate.measurements)
-    try:
-        st.table(campaign_recreate.posterior_stats(recommendations))
-    except:
-        None
+    info = campaign_recreate.measurements
+    max_yield_per_batch = info.groupby('BatchNr')['Yield'].max().reset_index()
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(max_yield_per_batch['BatchNr'], max_yield_per_batch['Yield'], marker='o')
+    ax.set_title('Learning Curve: Max Yield per Batch')
+    ax.set_xlabel('Batch Number')
+    ax.set_ylabel('Max Yield')
+    ax.grid(True)
+    
+    st.pyplot(fig)
     return None
 
 def main():
@@ -338,6 +344,9 @@ def main():
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button("Download JSON file", st.session_state.new_campaign, file_name= f"{now}_{campaign_name}.json")
         st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
+
+        plot_learning_curve(campaign)
+        
         if st.toggle("Show statistics - work in progress, not complete!"):
             show_stats(st.session_state.new_campaign,st.session_state.reactions)
 
