@@ -131,7 +131,11 @@ def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
     st.write(info)
-    num_rounds = info["BatchNr"].max()
+    try:
+        num_rounds = info["BatchNr"].max()
+    except KeyError:
+        st.warning("Insufficient rounds performed to plot optimisation curve")
+        return None
     if num_rounds > 1:
         fig, ax = plt.subplots(figsize=(8, 5))
         for obj in objective_dict:
