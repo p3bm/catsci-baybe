@@ -1,5 +1,4 @@
 from baybe import Campaign
-# from baybe.objective import Objective
 from baybe.objectives import SingleTargetObjective, DesirabilityObjective
 from baybe.parameters import NumericalDiscreteParameter, NumericalContinuousParameter, CategoricalParameter, SubstanceParameter
 from baybe.searchspace import SearchSpace
