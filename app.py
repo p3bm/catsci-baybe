@@ -345,7 +345,7 @@ def main():
         st.download_button("Download JSON file", st.session_state.new_campaign, file_name= f"{now}_{campaign_name}.json")
         st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
 
-        plot_learning_curve(campaign)
+        plot_learning_curve(st.session_state.new_campaign)
         
         if st.toggle("Show statistics - work in progress, not complete!"):
             show_stats(st.session_state.new_campaign,st.session_state.reactions)
