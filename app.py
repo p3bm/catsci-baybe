@@ -125,7 +125,10 @@ def recommend_input():
 def get_current_round(campaign):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
-    return info["BatchNr"].max()
+    try:
+        return info["BatchNr"].max()
+    except KeyError:
+        return 0
 
 def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
