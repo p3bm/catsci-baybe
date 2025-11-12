@@ -1,10 +1,7 @@
 import streamlit as st
-from utils import convert_params, create_campaign, recommend_reactions
-from baybe.searchspace import SearchSpace
+from utils import create_campaign, recommend_reactions
 from baybe import Campaign
-from baybe.objective import Objective
-from baybe.targets import NumericalTarget
-from baybe.recommenders import RandomRecommender, FPSRecommender, KMeansClusteringRecommender, SequentialGreedyRecommender, TwoPhaseMetaRecommender
+from baybe.recommenders import RandomRecommender, FPSRecommender, KMeansClusteringRecommender, BotorchRecommender, TwoPhaseMetaRecommender
 # from baybe.strategies import TwoPhaseStrategy
 from baybe.surrogates import (
     BayesianLinearSurrogate,
@@ -88,13 +85,14 @@ def create_continuous_numerical_fields(num_numerical_variables):
 def create_objective_fields(num_objective_variables):
     objective_dict = {}
     for i in range(num_objective_variables):
-        variable_name = st.text_input(f"Objective {i + 1} name:", placeholder = 'Yield')
-        variable_values = st.text_input(f"Objective {i + 1} mode (comma-separated):", placeholder= "max")
-        # weights = st.number_input()
-        values = [value.strip() for value in variable_values.split(',')]
-
+        values = {}
+        variable_name = st.text_input(f"Objective {i + 1} name:", placeholder='Yield')
+        variable_mode = st.selectbox(f"Objective {i + 1} mode:", options=["max", "min"])
+        variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0, key="lower_obj_bound")
+        variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100, key="upper_obj_bound")
+        values["mode"] = variable_mode
+        values["bounds"] = (variable_lower_bound,variable_upper_bound)
         objective_dict[variable_name] = values
-    # st.write(objective_dict)
     return objective_dict
 
 def upload_file(key):
@@ -103,7 +101,7 @@ def upload_file(key):
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'json':
         stringio = StringIO(uploaded_files.getvalue().decode("utf-8"))
         data = stringio.read()
-        # st.json(data)
+
         return data
     
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'csv':
@@ -129,8 +127,6 @@ def main():
     #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
 
     ACQ_FUNCTION = "qEI"
-    ALLOW_REPEATED_RECOMMENDATIONS = False
-    ALLOW_RECOMMENDING_ALREADY_MEASURED = False
     
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
@@ -290,12 +286,11 @@ def main():
             ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
 
     strategy = TwoPhaseMetaRecommender(
-                    initial_recommender= strategy_functions_first[initial_recommender],
-                    recommender=SequentialGreedyRecommender(
-                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION,
-                        allow_repeated_recommendations=ALLOW_REPEATED_RECOMMENDATIONS,
-                        allow_recommending_already_measured=ALLOW_RECOMMENDING_ALREADY_MEASURED
-                    ),)
+                    initial_recommender=strategy_functions_first[initial_recommender],
+                    recommender=BotorchRecommender(
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                        )
+                    )
     
     st.divider()
     st.header("Create Reaction Space")
@@ -318,11 +313,6 @@ def main():
 
     st.divider()
     st.header("Recommend Reactions")
-
-    if st.toggle("Allow repeated recommendations", key="recommend repeats"):
-        ALLOW_REPEATED_RECOMMENDATIONS = True
-    if st.toggle("Allow recommending parameter combinations already tested", key="recommend already measured"):
-        ALLOW_RECOMMENDING_ALREADY_MEASURED = True
 
     campaign_previous = upload_file(key='latest campaign JSON')
     

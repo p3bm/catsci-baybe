@@ -18,7 +18,6 @@ def convert_substance_variable(sub_dict, name):
     return SubstanceParameter(name, data=sub_dict, encoding="MORDRED")
 
 
-
 def convert_categorical_variable(cat_list, name):
     """_summary_
 
@@ -27,7 +26,6 @@ def convert_categorical_variable(cat_list, name):
         name (_type_): _description_
     """
     return CategoricalParameter(name, values=cat_list)
-
 
 
 def convert_discrete_numerical_variable(num_list, name):
@@ -39,7 +37,6 @@ def convert_discrete_numerical_variable(num_list, name):
     return NumericalDiscreteParameter(name, values=num_list)
 
 
-
 def convert_continuous_numerical_variable(bounds_tuple, name):
     """_summary_
 
@@ -49,16 +46,15 @@ def convert_continuous_numerical_variable(bounds_tuple, name):
     return NumericalContinuousParameter(name, bounds=bounds_tuple)
 
 
-
-def convert_objective_variable(name, mode):
+def convert_objective_variable(name, mode, bounds):
     """_summary_
 
     Args:
         name (_type_): _description_
         mode (_type_): _description_
+        bounds (_type_): _description_
     """
-    return NumericalTarget(name=name, mode=mode, bounds=(0, 100), transformation="LINEAR")
-
+    return NumericalTarget(name=name, mode=mode, bounds=bounds, transformation="LINEAR")
 
 
 def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> list:
@@ -97,8 +93,8 @@ def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_d
         parameters.append(variable)
     
     for obj in obj_dict:
-        
-        target = convert_objective_variable(name = obj, mode= obj_dict[obj][0].upper())
+        values = obj_dict[obj]
+        target = convert_objective_variable(name=obj, mode=values["mode"].upper(), bounds=values["bounds"])
         objectives.append(target)
 
     return parameters, objectives
@@ -134,8 +130,6 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
     campaign = Campaign(searchspace=searchspace,objective=objective, recommender= strategy)
 
     return campaign.to_json()
-
-
 
 
 def recommend_reactions(campaign, df, batch_reactions)-> pd.DataFrame:
