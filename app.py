@@ -130,21 +130,20 @@ def get_current_round(campaign):
 def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
-    num_batches = info["BatchNr"].max()
-    if num_batches > 1:
-        data_to_plot = {}
+    num_rounds = info["BatchNr"].max()
+    if num_rounds > 1:
         fig, ax = plt.subplots(figsize=(8, 5))
         for obj in objective_dict:
             values = objective_dict[obj]
             if values["mode"].lower() == 'max':
-                data_to_plot[obj] = info.groupby('BatchNr')[obj].max().reset_index()
+                y = info.groupby('BatchNr')[obj].max().reset_index()
             else:
-                data_to_plot[obj] = info.groupby('BatchNr')[obj].min().reset_index()
+                y = info.groupby('BatchNr')[obj].min().reset_index()
         
-            ax.plot(max_yield_per_batch['BatchNr'], max_yield_per_batch['Yield'], marker='o', label=obj)
-        ax.set_title('Learning Curve: Max Yield per Batch')
+            ax.plot([x+1 for x in range(num_rounds)], y, marker='o', label=obj)
+        ax.set_title('Best Objective Outcome(s) vs. Round Number')
         ax.set_xlabel('Round Number')
-        ax.set_ylabel('Max Yield')
+        ax.set_ylabel('Objective Variable Value')
         ax.legend()
         st.pyplot(fig)
         return None
