@@ -19,6 +19,8 @@ from io import StringIO
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
+import shap
+from streamlit_shap import st_shap
 
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
@@ -142,6 +144,15 @@ def plot_learning_curve(campaign,objective_dict):
         return None
     st.warning("Insufficient rounds performed to plot optimisation curve")
     return None
+
+def show_SHAP(campaign):
+    campaign_recreate = Campaign.from_json(campaign)
+    data = campaign_recreate.measurements[[p.name for p in campaign_recreate.parameters]]
+    model = lambda x: campaign_recreate.get_surrogate().posterior(x).mean
+
+    explainer = shap.Explainer(model, data)
+    shap_values = explainer(data)
+    st_shap(shap.plots.bar(shap_values))
 
 def main():
     
@@ -375,6 +386,9 @@ def main():
         st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
 
         plot_learning_curve(st.session_state.new_campaign)
-        
+
+        if st.toggle("Show SHAP values"):
+            show_SHAP(st.session_state.new_campaign)
+            
 if __name__ == "__main__":
     main()
