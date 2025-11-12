@@ -319,14 +319,16 @@ def main():
         }
         
         if num_objectives == 1:
-            ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_single], index=1, key="single_obj_acq_func")
+            acq_function_name = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_single], index=1, key="single_obj_acq_func")
+            acq_function = acq_functions_single[acq_function_name]
         else:
-            ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_multi], index=1, key="multi_obj_acq_func")
-
+            acq_function_name = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_multi], index=1, key="multi_obj_acq_func")
+            acq_function = acq_functions_multi[acq_function_name]
+    
     strategy = TwoPhaseMetaRecommender(
                     initial_recommender=strategy_functions_first[initial_recommender],
                     recommender=BotorchRecommender(
-                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=acq_functions[ACQ_FUNCTION]
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=acq_function
                         )
                     )
     
