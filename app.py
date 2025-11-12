@@ -121,7 +121,12 @@ def recommend_input():
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
         return df
-        
+
+def get_current_round(campaign):
+    campaign_recreate = Campaign.from_json(campaign)
+    info = campaign_recreate.measurements
+    return info["BatchNr"].max()
+
 def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
@@ -360,7 +365,7 @@ def main():
 
     if st.session_state.campaign_generated:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button("Download campaign JSON", st.session_state.campaign_json, file_name= f'{now}_{campaign_name}.json')
+        st.download_button("Download campaign JSON", st.session_state.campaign_json, file_name= f'{now}_{campaign_name}_initial.json')
 
     st.divider()
     st.header("Recommend Reactions")
@@ -382,8 +387,15 @@ def main():
 
     if st.session_state.recommendations_made and "new_campaign" in st.session_state and "reactions" in st.session_state:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button("Download JSON file", st.session_state.new_campaign, file_name= f"{now}_{campaign_name}.json")
-        st.download_button("Download recommended reactions", st.session_state.reactions.to_csv().encode('utf-8'), file_name= f'{now}_{campaign_name}_reactions.csv', mime= 'text/csv')
+        
+        st.download_button("Download JSON file",
+                           st.session_state.new_campaign,
+                           file_name= f"{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}.json")
+        
+        st.download_button("Download recommended reactions",
+                           st.session_state.reactions.to_csv().encode('utf-8'),
+                           file_name= f'{now}_{campaign_name}_reactions.csv',
+                           mime= 'text/csv')
 
         plot_learning_curve(st.session_state.new_campaign, objective_dict)
 
