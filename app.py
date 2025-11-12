@@ -2,7 +2,6 @@ import streamlit as st
 from utils import create_campaign, recommend_reactions
 from baybe import Campaign
 from baybe.recommenders import RandomRecommender, FPSRecommender, KMeansClusteringRecommender, BotorchRecommender, TwoPhaseMetaRecommender
-# from baybe.strategies import TwoPhaseStrategy
 from baybe.surrogates import (
     BayesianLinearSurrogate,
     GaussianProcessSurrogate,
