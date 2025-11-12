@@ -152,7 +152,7 @@ def show_SHAP(campaign):
 
     explainer = shap.Explainer(model, data)
     shap_values = explainer(data)
-    st_shap(shap.plots.bar(shap_values))
+    st_shap(shap.plots.bar(shap_values), width=600, height=400)
 
 def main():
     
