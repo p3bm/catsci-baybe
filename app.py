@@ -93,8 +93,8 @@ def create_objective_fields(num_objective_variables):
         values = {}
         variable_name = st.text_input(f"Objective {i + 1} name:", placeholder='Yield')
         variable_mode = st.selectbox(f"Objective {i + 1} mode:", options=["max", "min"])
-        variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0, key="lower_obj_bound")
-        variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100, key="upper_obj_bound")
+        variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0)
+        variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100)
         values["mode"] = variable_mode
         values["bounds"] = (variable_lower_bound,variable_upper_bound)
         objective_dict[variable_name] = values
