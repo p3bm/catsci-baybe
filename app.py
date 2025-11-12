@@ -383,11 +383,7 @@ def main():
     df = recommend_input()
     
     if st.button("Get recommendations"):
-        try:
-            st.session_state.reactions, st.session_state.new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
-        except NotEnoughPointsLeftError:
-            st.error("The number of recommendations entered exceeds the number of parameter combinations left to explore!")
-            st.stop()
+        st.session_state.reactions, st.session_state.new_campaign = recommend_reactions(campaign_previous, df, batch_reactions)
         if st.session_state.reactions is not None and st.session_state.new_campaign is not None:
             st.data_editor(st.session_state.reactions)
             st.session_state.recommendations_made = True
