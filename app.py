@@ -37,49 +37,49 @@ strategy_functions_second = {
 def create_categorical_fields(num_variables):
     variable_dict = {}
     for i in range(num_variables):
-        variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. base treament')
-        variable_values = st.text_input(f"Variable {i + 1} categories (comma-separated):", placeholder= "ground, unground")
-
+        with st.container(border=True, key=f"cat_var_{i}"):
+            variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. base treament')
+            variable_values = st.text_input(f"Variable {i + 1} categories (comma-separated):", placeholder= "ground, unground")
+            
         values = [value.strip() for value in variable_values.split(',')]
-
         variable_dict[variable_name] = values
-    # st.write(variable_dict)
     return variable_dict
 
 def create_substance_fields(num_variables):
     variable_dict = {}
     for i in range(num_variables):
-        variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. solvent')
-        variable_values = st.text_input(f"Variable {i + 1} names (comma-separated):", placeholder= "methanol, ethanol, etc.")
-        variable_smile_values = st.text_input(f"Variable {i + 1} SMILE strings (comma-separated):", placeholder= "CO, CCO, etc.")
+        with st.container(border=True, key=f"sub_var_{i}"):
+            variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. solvent')
+            variable_values = st.text_input(f"Variable {i + 1} names (comma-separated):", placeholder= "methanol, ethanol, etc.")
+            variable_smile_values = st.text_input(f"Variable {i + 1} SMILE strings (comma-separated):", placeholder= "CO, CCO, etc.")
 
         keys = [value.strip() for value in variable_values.split(',')]
         values = [value.strip() for value in variable_smile_values.split(',')]
-    
         variable_dict[variable_name] = dict(zip(keys, values))
-    # st.write(variable_dict)
     return variable_dict
 
 def create_discrete_numerical_fields(num_numerical_variables):
     variable_dict = {}
     for i in range(num_numerical_variables):
-        variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. temperature')
-        variable_values = st.text_input(f"Variable {i + 1} values (comma-separated):", placeholder= "40,60,80")
+        with st.container(border=True, key=f"disc_num_var_{i}"):
+            variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. temperature')
+            variable_values = st.text_input(f"Variable {i + 1} values (comma-separated):", placeholder= "40,60,80")
+            
         values = [value.strip() for value in variable_values.split(',')]
-
         variable_dict[variable_name] = values
     return variable_dict
 
 def create_continuous_numerical_fields(num_numerical_variables):
     variable_dict = {}
     for i in range(num_numerical_variables):
-        variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
-        variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
-        bounds = [value.strip() for value in variable_values.split(',')]
-        try:
-            bounds = (bounds[0], bounds[1])
-        except IndexError:
-            bounds = (None, None)
+        with st.container(border=True, key=f"cont_num_var_{i}"):
+            variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
+            variable_values = st.text_input(f"Variable {i + 1} lower and upper bounds (comma-separated):", placeholder= "0.8,2.0")
+            bounds = [value.strip() for value in variable_values.split(',')]
+            try:
+                bounds = (bounds[0], bounds[1])
+            except IndexError:
+                bounds = (None, None)
         variable_dict[variable_name] = bounds
 
     for key in variable_dict:
@@ -92,10 +92,11 @@ def create_objective_fields(num_objective_variables):
     objective_dict = {}
     for i in range(num_objective_variables):
         values = {}
-        variable_name = st.text_input(f"Objective {i + 1} name:", placeholder='Yield')
-        variable_mode = st.selectbox(f"Objective {i + 1} mode:", options=["max", "min"])
-        variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0)
-        variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100)
+        with st.container(border=True, key=f"obj_var_{i}"):
+            variable_name = st.text_input(f"Objective {i + 1} name:", placeholder='Yield')
+            variable_mode = st.selectbox(f"Objective {i + 1} mode:", options=["max", "min"])
+            variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0)
+            variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100)
         values["mode"] = variable_mode
         values["bounds"] = (variable_lower_bound,variable_upper_bound)
         objective_dict[variable_name] = values
@@ -119,19 +120,27 @@ def recommend_input():
         df = upload_file(key='Reactions data CSV')
         return df
         
-def plot_learning_curve(campaign):
+def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
-    max_yield_per_batch = info.groupby('BatchNr')['Yield'].max().reset_index()
-    
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(max_yield_per_batch['BatchNr'], max_yield_per_batch['Yield'], marker='o')
-    ax.set_title('Learning Curve: Max Yield per Batch')
-    ax.set_xlabel('Batch Number')
-    ax.set_ylabel('Max Yield')
-    ax.grid(True)
-    
-    st.pyplot(fig)
+    num_batches = max(info["BatchNr"].values.to_list())
+    if num_batches > 1:
+        data_to_plot = {}
+        fig, ax = plt.subplots(figsize=(8, 5))
+        for obj, values in objective_dict:
+            if values["mode"].lower() == 'max':
+                data_to_plot[obj] = info.groupby('BatchNr')[obj].max().reset_index()
+            else:
+                data_to_plot[obj] = info.groupby('BatchNr')[obj].min().reset_index()
+        
+            ax.plot(max_yield_per_batch['BatchNr'], max_yield_per_batch['Yield'], marker='o', label=obj)
+        ax.set_title('Learning Curve: Max Yield per Batch')
+        ax.set_xlabel('Round Number')
+        ax.set_ylabel('Max Yield')
+        ax.legend()
+        st.pyplot(fig)
+        return None
+    st.warning("Insufficient rounds performed to plot optimisation curve")
     return None
 
 def main():
@@ -347,8 +356,5 @@ def main():
 
         plot_learning_curve(st.session_state.new_campaign)
         
-        if st.toggle("Show statistics - work in progress, not complete!"):
-            show_stats(st.session_state.new_campaign,st.session_state.reactions)
-
 if __name__ == "__main__":
     main()
