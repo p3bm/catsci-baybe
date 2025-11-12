@@ -119,7 +119,7 @@ def recommend_input():
         df = upload_file(key='Reactions data CSV')
         return df
         
-def plot_learning_curve(campaign,recommendations):
+def plot_learning_curve(campaign):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
     max_yield_per_batch = info.groupby('BatchNr')['Yield'].max().reset_index()
