@@ -135,7 +135,6 @@ def plot_learning_curve(campaign,objective_dict):
         fig, ax = plt.subplots(figsize=(8, 5))
         for obj in objective_dict:
             values = objective_dict[obj]
-            st.write(values)
             if values["mode"].lower() == 'max':
                 y = info.groupby('BatchNr')[obj].max().reset_index()
             else:
