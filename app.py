@@ -125,7 +125,7 @@ def recommend_input():
 def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
-    num_batches = max(info["BatchNr"].values.max())
+    num_batches = info["BatchNr"].max()
     if num_batches > 1:
         data_to_plot = {}
         fig, ax = plt.subplots(figsize=(8, 5))
