@@ -133,7 +133,6 @@ def get_current_round(campaign):
 def plot_learning_curve(campaign,objective_dict):
     campaign_recreate = Campaign.from_json(campaign)
     info = campaign_recreate.measurements
-    st.write(info)
     try:
         num_rounds = info["BatchNr"].max()
     except KeyError:
