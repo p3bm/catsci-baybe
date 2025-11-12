@@ -243,21 +243,6 @@ def main():
     st.divider()
 
     campaign_name = st.text_input("Enter a campaign name", value="", key="campaign_name")
-
-    acq_functions = {
-        "Expected Improvement" : "EI",
-        "quasi Expected Improvement" : "qEI",
-        "quasi Noisy Expected Improvement" : "qNEI",
-        "Log Expected Improvement" : "LogEI",
-        "quasi Log Expected Improvement" : "qLogEI",
-        "Upper Confidence Bound" : "UCB",
-        "quasi Upper Confidence Bound" : "qUCB",
-        "quasi Expected Hypervolume Improvement" : "qEHVI",
-        "quasi Noisy Expected Hypervolume Improvement" : "qNEHVI",
-        "quasi Log Expected Hypervolume Improvement" : "qLEHVI"
-    }
-    
-    ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions], index=1)
     
     st.header("Outline Parameters and Objective(s)")
     
@@ -307,7 +292,7 @@ def main():
             weights = None
 
     with st.container(border=True, key="recomms"):
-        st.subheader("Select Recommenders")
+        st.subheader("Campaign Settings")
         
         initial_recommender = st.selectbox(
             'Select a stratgey to use for the initial recommendations:',
@@ -316,6 +301,27 @@ def main():
         second_recommender = st.selectbox(
             "Select a surrogate model type to recommend new reactions when reaction data becomes available:",
             ("Gaussian Process", "Random Forest", "NGBoost", "Bayesian Linear"))
+
+        acq_functions_single = {
+            "Expected Improvement" : "EI",
+            "quasi Expected Improvement" : "qEI",
+            "quasi Noisy Expected Improvement" : "qNEI",
+            "Log Expected Improvement" : "LogEI",
+            "quasi Log Expected Improvement" : "qLogEI",
+            "Upper Confidence Bound" : "UCB",
+            "quasi Upper Confidence Bound" : "qUCB"
+        }
+
+        acq_functions_multi = {
+            "quasi Expected Hypervolume Improvement" : "qEHVI",
+            "quasi Noisy Expected Hypervolume Improvement" : "qNEHVI",
+            "quasi Log Expected Hypervolume Improvement" : "qLEHVI"
+        }
+        
+        if num_objectives == 1:
+            ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_single], index=1, key="single_obj_acq_func")
+        else:
+            ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_multi], index=1, key="multi_obj_acq_func")
 
     strategy = TwoPhaseMetaRecommender(
                     initial_recommender=strategy_functions_first[initial_recommender],
