@@ -248,8 +248,8 @@ def main():
         "Expected Improvement" : "EI",
         "quasi Expected Improvement" : "qEI",
         "quasi Noisy Expected Improvement" : "qNEI",
-        "Log Expected Improvement" : "LogEI"
-        "quasi Log Expected Improvement" : "qLogEI"
+        "Log Expected Improvement" : "LogEI",
+        "quasi Log Expected Improvement" : "qLogEI",
         "Upper Confidence Bound" : "UCB",
         "quasi Upper Confidence Bound" : "qUCB",
         "quasi Expected Hypervolume Improvement" : "qEHVI",
