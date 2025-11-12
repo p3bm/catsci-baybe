@@ -144,9 +144,6 @@ def plot_learning_curve(campaign,objective_dict):
     return None
 
 def main():
-    #st.set_page_config(page_title=None, page_icon="🧪", layout="wide")
-
-    ACQ_FUNCTION = "qEI"
     
     st.image('./catsci-logo.svg', width=200)  # Adjust width as needed
     st.title("Bayesian Reaction Optimizer")
@@ -246,6 +243,21 @@ def main():
     st.divider()
 
     campaign_name = st.text_input("Enter a campaign name", value="", key="campaign_name")
+
+    acq_functions = {
+        "Expected Improvement" : "EI",
+        "quasi Expected Improvement" : "qEI",
+        "quasi Noisy Expected Improvement" : "qNEI",
+        "Log Expected Improvement" : "LogEI"
+        "quasi Log Expected Improvement" : "qLogEI"
+        "Upper Confidence Bound" : "UCB",
+        "quasi Upper Confidence Bound" : "qUCB",
+        "quasi Expected Hypervolume Improvement" : "qEHVI",
+        "quasi Noisy Expected Hypervolume Improvement" : "qNEHVI",
+        "quasi Log Expected Hypervolume Improvement" : "qLEHVI"
+    }
+    
+    ACQ_FUNCTION = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions], index=1)
     
     st.header("Outline Parameters and Objective(s)")
     
@@ -308,7 +320,7 @@ def main():
     strategy = TwoPhaseMetaRecommender(
                     initial_recommender=strategy_functions_first[initial_recommender],
                     recommender=BotorchRecommender(
-                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=ACQ_FUNCTION
+                        surrogate_model= strategy_functions_second[second_recommender], acquisition_function=acq_functions[ACQ_FUNCTION]
                         )
                     )
     
