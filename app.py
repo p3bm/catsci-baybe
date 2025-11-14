@@ -352,15 +352,11 @@ def main():
 
     if st.button("Generate"):
         with st.spinner('Processing...'):
-            try:
-                st.session_state.campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                                disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                                objective_dict, strategy, weights)
+            st.session_state.campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
+                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
+                                            objective_dict, strategy, weights)
 
-                st.session_state.campaign_generated = True
-            except ValueError:
-                st.error("You may have forgotten to enter a name and optimisation mode for the objective variable(s). Check this and try again.")
-                st.stop()
+            st.session_state.campaign_generated = True
 
     if st.session_state.campaign_generated:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
