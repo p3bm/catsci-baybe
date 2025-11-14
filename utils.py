@@ -59,8 +59,7 @@ def convert_objective_variable(name, mode, bounds):
     if mode.lower() == "min":
         min_mode = True
 
-    target = NumericalTarget(name=name, minimize=min_mode, transformation="MINMAX")
-    target.clamp(min=bounds[0], max=bounds[1])
+    target = NumericalTarget.normalized_ramp(name, cutoffs=(bounds[0], bounds[1]), descending=min_mode)
     
     return target
 
