@@ -131,7 +131,7 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
     return campaign.to_json()
 
 
-def recommend_reactions(campaign, df, batch_reactions)-> pd.DataFrame:
+def recommend_reactions(campaign, df, batch_size)-> pd.DataFrame:
     recommendations = None
     campaign_recreate = None
     if campaign:
@@ -159,12 +159,12 @@ def recommend_reactions(campaign, df, batch_reactions)-> pd.DataFrame:
         target_names = [target["name"] for target in target_list]
 
         if df is None:
-            recommendations = campaign_recreate.recommend(batch_size= batch_reactions)
+            recommendations = campaign_recreate.recommend(batch_size=batch_size)
             for target_column in target_names:
                 recommendations[target_column] = None
         else:
             campaign_recreate.add_measurements(df)
-            recommendations = campaign_recreate.recommend(batch_size= batch_reactions)
+            recommendations = campaign_recreate.recommend(batch_size=batch_size)
             for target_column in target_names:
                 recommendations[target_column] = None
         
