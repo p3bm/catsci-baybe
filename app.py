@@ -139,7 +139,7 @@ def plot_learning_curve(campaign,objective_dict):
             else:
                 y = info.groupby('BatchNr')[obj].min().reset_index()
         
-            plt_ax.line([x+1 for x in range(num_rounds)], y, marker='o', label=obj)
+            plt_ax.scatter([x+1 for x in range(num_rounds)], y, marker='o', label=obj)
         plt_ax.set_title('Best Objective Outcome(s) vs. Round Number')
         plt_ax.set_xlabel('Round Number')
         plt_ax.set_ylabel('Objective Variable Value')
