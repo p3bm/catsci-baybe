@@ -81,7 +81,8 @@ def create_continuous_numerical_fields(num_numerical_variables):
             try:
                 bounds = (bounds[0], bounds[1])
             except IndexError:
-                bounds = (None, None)
+                st.error("Invalid variable bounds")
+                st.stop()
         variable_dict[variable_name] = bounds
 
     for key in variable_dict:
@@ -100,7 +101,7 @@ def create_objective_fields(num_objective_variables):
             variable_lower_bound = st.number_input(f"Lower bound of objective {i + 1}", value=0)
             variable_upper_bound = st.number_input(f"Upper bound of objective {i + 1}", value=100)
         values["mode"] = variable_mode
-        values["bounds"] = (variable_lower_bound,variable_upper_bound)
+        values["bounds"] = [variable_lower_bound,variable_upper_bound]
         objective_dict[variable_name] = values
     return objective_dict
 
