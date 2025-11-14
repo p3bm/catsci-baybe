@@ -141,6 +141,7 @@ def plot_learning_curve(campaign,objective_dict):
             ax.plot(data["BatchNr"], data[obj], marker='o', label=obj)
         ax.set_title('Best Objective Outcome(s) vs. Round Number')
         ax.set_xlabel('Round Number')
+        ax.set_xticks(data["BatchNr"])
         ax.set_ylabel('Objective Variable Value')
         ax.legend()
         st.pyplot(fig, clear_figure=True)
