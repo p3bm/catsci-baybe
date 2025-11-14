@@ -111,6 +111,7 @@ def recommend_input():
     past_recommendation = st.toggle('Include existing reaction data')
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
+        st.write(df.shape)
         return df
     return None
 
