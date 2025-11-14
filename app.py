@@ -121,6 +121,7 @@ def recommend_input():
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
         return df
+    return None
 
 def get_current_round(campaign):
     campaign_recreate = Campaign.from_json(campaign)
