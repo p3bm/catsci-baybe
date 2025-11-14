@@ -3,3 +3,4 @@ streamlit
 baybe
 shap
 streamlit-shap
+matplotlib
