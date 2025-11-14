@@ -144,7 +144,7 @@ def plot_learning_curve(campaign,objective_dict):
         plt_ax.set_xlabel('Round Number')
         plt_ax.set_ylabel('Objective Variable Value')
         plt_ax.legend()
-        st.pyplot(plt_fig)
+        st.pyplot(plt_fig, clear_figure=True)
         return None
     st.warning("Insufficient rounds performed to plot optimisation curve")
     return None
