@@ -128,7 +128,7 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
                                             objective_dict)
     searchspace = SearchSpace.from_product(parameters=parameters)
     if len(objectives) > 1:
-        objective = DesirabilityObjective(target=objectives, weights=weights)
+        objective = DesirabilityObjective(targets=objectives, weights=weights)
     else:
         objective = SingleTargetObjective(target=objectives[0])
 
