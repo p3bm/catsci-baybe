@@ -53,7 +53,16 @@ def convert_objective_variable(name, mode, bounds):
         mode (_type_): _description_
         bounds (_type_): _description_
     """
-    return NumericalTarget(name=name, mode=mode, bounds=bounds, transformation="LINEAR")
+
+    min_mode = False
+    
+    if mode.lower() == "min":
+        min_mode = True
+        
+    target = NumericalTarget(name=name, minimize=min_mode)
+    target.clamp(bounds)
+    
+    return target
 
 
 def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> list:
