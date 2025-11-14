@@ -58,7 +58,8 @@ def convert_objective_variable(name, mode, bounds):
     
     if mode.lower() == "min":
         min_mode = True
-        
+
+    st.write(NumericalTarget.TRANSFORMATIONS)
     target = NumericalTarget(name=name, minimize=min_mode)
     target.clamp(min=bounds[0], max=bounds[1])
     
