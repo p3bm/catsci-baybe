@@ -392,7 +392,10 @@ def main():
                            file_name= f'{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}_reactions.csv',
                            mime= 'text/csv')
 
-        plot_learning_curve(st.session_state.new_campaign, objective_dict)
+        try:
+            plot_learning_curve(st.session_state.new_campaign, objective_dict)
+        except ValueError:
+            None
 
         if st.toggle("Show SHAP values"):
             show_SHAP(st.session_state.new_campaign)
