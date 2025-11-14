@@ -131,20 +131,21 @@ def plot_learning_curve(campaign,objective_dict):
         st.warning("Insufficient rounds performed to plot optimisation curve")
         return None
     if num_rounds > 1:
-        fig, ax = plt.subplots(figsize=(8, 5))
+        plt_fig, plt_ax = plt.subplots(figsize=(8, 5))
         for obj in objective_dict:
+            st.write(objective_dict)
             values = objective_dict[obj]
             if values["mode"].lower() == 'max':
                 y = info.groupby('BatchNr')[obj].max().reset_index()
             else:
                 y = info.groupby('BatchNr')[obj].min().reset_index()
         
-            ax.plot([x+1 for x in range(num_rounds)], y, marker='o', label=obj)
-        ax.set_title('Best Objective Outcome(s) vs. Round Number')
-        ax.set_xlabel('Round Number')
-        ax.set_ylabel('Objective Variable Value')
-        ax.legend()
-        st.pyplot(fig)
+            plt_ax.plot([x+1 for x in range(num_rounds)], y, marker='o', label=obj)
+        plt_ax.set_title('Best Objective Outcome(s) vs. Round Number')
+        plt_ax.set_xlabel('Round Number')
+        plt_ax.set_ylabel('Objective Variable Value')
+        plt_ax.legend()
+        st.pyplot(plt_fig)
         return None
     st.warning("Insufficient rounds performed to plot optimisation curve")
     return None
