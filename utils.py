@@ -124,6 +124,7 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
         # objective = 
     else:
         # mode = "SINGLE"
+        st.write(f"DEBUG: {objectives[0]}")
         objective = SingleTargetObjective(target= objectives[0])
 
     campaign = Campaign(searchspace=searchspace,objective=objective, recommender= strategy)
