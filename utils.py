@@ -60,7 +60,7 @@ def convert_objective_variable(name, mode, bounds):
         min_mode = True
         
     target = NumericalTarget(name=name, minimize=min_mode)
-    target.clamp(bounds)
+    target.clamp(min=bounds[0], max=bounds[1])
     
     return target
 
@@ -128,15 +128,11 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
                                             objective_dict)
     searchspace = SearchSpace.from_product(parameters=parameters)
     if len(objectives) > 1:
-        # mode = "DESIRABILITY"
-        objective = DesirabilityObjective(targets = objectives, weights = weights)
-        # objective = 
+        objective = DesirabilityObjective(target=objectives, weights=weights)
     else:
-        # mode = "SINGLE"
-        st.write(f"DEBUG: {objectives[0]}")
-        objective = SingleTargetObjective(target= objectives[0])
+        objective = SingleTargetObjective(target=objectives[0])
 
-    campaign = Campaign(searchspace=searchspace,objective=objective, recommender= strategy)
+    campaign = Campaign(searchspace=searchspace, objective=objective, recommender=strategy)
 
     return campaign.to_json()
 
