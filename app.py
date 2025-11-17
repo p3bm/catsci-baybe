@@ -403,7 +403,7 @@ def main():
                            file_name= f"{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}.json")
         
         st.download_button("Download recommended reactions",
-                           st.session_state.reactions.to_csv().encode('utf-8'),
+                           st.session_state.reactions.to_csv(index=False).encode('utf-8'),
                            file_name= f'{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}_reactions.csv',
                            mime= 'text/csv')
 
