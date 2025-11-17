@@ -22,6 +22,150 @@ import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
 
+
+# Safe debugging helpers for BayBE - put this near the top of your app (after imports)
+import types
+import inspect
+import numpy as np
+import torch
+import traceback
+
+# ---------------------
+# Helper: restore original if accidentally overwritten
+# ---------------------
+def safe_restore(module, name, backup_name):
+    """If backup exists on the module, restore the original attribute."""
+    if hasattr(module, backup_name):
+        setattr(module, name, getattr(module, backup_name))
+        delattr(module, backup_name)
+
+# ---------------------
+# 1) Safely patch BayesianRecommender._setup_botorch_acqf
+#    - Do NOT allow double-patching (guard with attribute)
+#    - Keep a true copy of the original under a private backup name
+# ---------------------
+from baybe.recommenders.pure.bayesian.base import BayesianRecommender
+
+if not hasattr(BayesianRecommender, "_dbg_original__setup_botorch_acqf"):
+    # store the original method (unbound function)
+    BayesianRecommender._dbg_original__setup_botorch_acqf = BayesianRecommender._setup_botorch_acqf
+
+def _dbg_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
+    # Print only a few lines (Streamlit or stdout)
+    try:
+        print("\n=== DEBUG: _setup_botorch_acqf ===")
+        # measurements.targets might be a special object; convert cautiously
+        try:
+            mt = np.asarray(measurements.targets)
+            print("measurements.targets np.shape:", mt.shape)
+            if mt.size <= 40:
+                print("measurements.targets sample:", mt)
+            else:
+                print("measurements.targets sample (first 10):", mt[:10])
+        except Exception as e:
+            print("Could not show measurements.targets:", e)
+
+        # show the objective descriptor (type / repr)
+        try:
+            print("objective type:", type(objective))
+            try:
+                # Show objective internal description if available
+                if hasattr(objective, "to_dict"):
+                    print("objective.to_dict():", objective.to_dict())
+                else:
+                    print("objective repr:", repr(objective))
+            except Exception:
+                pass
+        except Exception:
+            pass
+
+    except Exception as dbg_exc:
+        print("DEBUG helper error in _dbg_setup_botorch_acqf:", dbg_exc)
+        traceback.print_exc()
+
+    # finally call the original implementation (the true original, not the wrapper)
+    return BayesianRecommender._dbg_original__setup_botorch_acqf(self, searchspace, objective, measurements, pending)
+
+# install wrapper
+BayesianRecommender._setup_botorch_acqf = _dbg_setup_botorch_acqf
+
+# ---------------------
+# 2) Safely inspect Objective.to_botorch outputs without breaking its contract
+#    - We won't replace the returned object with a function.
+#    - We'll wrap Objective.to_botorch to call original and then *inspect* the returned object,
+#      but then return the *same* object unchanged so that attrs validators are satisfied.
+# ---------------------
+from baybe.objectives.base import Objective
+
+if not hasattr(Objective, "_dbg_original__to_botorch"):
+    Objective._dbg_original__to_botorch = Objective.to_botorch
+
+def _dbg_to_botorch(self):
+    # call original to obtain the real BoTorch objective object (or None)
+    obj = Objective._dbg_original__to_botorch(self)
+
+    try:
+        print("\n=== DEBUG: Objective.to_botorch() was called ===")
+        print("Objective instance type:", type(self))
+        # print short summary of what was returned (type and attributes)
+        print("returned type:", type(obj))
+        # If it's a BoTorch object with `__call__` or `.forward`, try a dry call with a tiny tensor
+        if obj is not None:
+            # build a tiny test tensor - do not try large tensors
+            # need to derive number of outputs expected: we can try (1, n_targets)
+            # infer n_targets from self if possible
+            try:
+                # best-effort: if the objective has attribute 'n_targets' or similar
+                n_targets = None
+                if hasattr(self, "n_targets"):
+                    n_targets = int(getattr(self, "n_targets"))
+                elif hasattr(self, "targets"):
+                    n_targets = int(len(getattr(self, "targets")))
+                # fallback to 2 if unknown (safe small tensor)
+                if n_targets is None:
+                    n_targets = 2
+
+                test_x = torch.zeros((1, n_targets))
+                print("Attempting dry-call obj(test_x) with test_x.shape:", tuple(test_x.shape))
+                try:
+                    out = obj(test_x)
+                    # try to print shape if possible
+                    try:
+                        out_np = out.detach().cpu().numpy()
+                        print("obj(test_x) -> numpy shape:", out_np.shape)
+                        if out_np.size <= 40:
+                            print("obj(test_x) -> sample:", out_np)
+                        else:
+                            print("obj(test_x) -> sample(first 10):", out_np.flatten()[:10])
+                    except Exception:
+                        try:
+                            out_np2 = np.asarray(out)
+                            print("obj(test_x) -> np.asarray shape:", out_np2.shape)
+                        except Exception as e2:
+                            print("Could not convert obj output to numpy:", e2)
+                except Exception as call_exc:
+                    print("Calling obj(test_x) raised exception (may be expected):")
+                    traceback.print_exc()
+            except Exception as e:
+                print("Failed preparing/doing dry-call on objective:", e)
+    except Exception as e_top:
+        print("DEBUG Objective.to_botorch wrapper hit exception:", e_top)
+        traceback.print_exc()
+
+    # return the original object unchanged so BayBE's validators are happy
+    return obj
+
+# install wrapper
+Objective.to_botorch = _dbg_to_botorch
+
+# ---------------------
+# 3) Clean up any previously-created accidental globals / wrappers
+#    If you previously put other debug names on these classes, remove them.
+# ---------------------
+# (No-op here intentionally; if you created other debug names earlier, remove them manually.)
+
+
+
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
     'Random': RandomRecommender(),
