@@ -163,15 +163,11 @@ def recommend_reactions(campaign, df, batch_size)-> pd.DataFrame:
    
         target_names = [target["name"] for target in target_list]
 
-        if df is None:
-            recommendations = campaign_recreate.recommend(batch_size=batch_size)
-            for target_column in target_names:
-                recommendations[target_column] = None
-        else:
+        if df is not None:
             campaign_recreate.add_measurements(df)
-            recommendations = campaign_recreate.recommend(batch_size=batch_size)
-            for target_column in target_names:
-                recommendations[target_column] = None
+        recommendations = campaign_recreate.recommend(batch_size=batch_size)
+        for target_column in target_names:
+            recommendations[target_column] = None
         
     else:
         st.error("Please upload valid file")
