@@ -23,83 +23,74 @@ import shap
 from streamlit_shap import st_shap
 
 
-import baybe.acquisition.acqfs as acqfs
+# Put this near the top of your app (after imports), before calling campaign.recommend()
 import numpy as np
+import torch
+import traceback
+from baybe.acquisition._builder import BotorchAcquisitionFunctionBuilder
 
-_original_compute_ref_point = acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point
-
-def debug_compute_ref_point(array, maximize=None, factor=0.1):
-    st.write("=== compute_ref_point() received array ===")
-    st.write("type:", type(array))
-    try:
-        arr_np = np.asarray(array)
-        st.write("shape:", arr_np.shape)
-        st.write("array:", arr_np)
-    except Exception as e:
-        st.write("array conversion failed:", e)
-    st.write("==========================================")
-    return _original_compute_ref_point(array, maximize, factor)
-
-acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point = debug_compute_ref_point
-
-import baybe.acquisition._builder as builder
-
-_original_set_ref_point = builder.BotorchAcquisitionFunctionBuilder._set_ref_point
+_original_set_ref_point = BotorchAcquisitionFunctionBuilder._set_ref_point
 
 def debug_set_ref_point(self):
-    st.write("\n=== entering _set_ref_point() ===")
-    # What does the builder think the target tensor is?
+    print("\n=== DEBUG: entering BotorchAcquisitionFunctionBuilder._set_ref_point ===")
     try:
-        tgt = self._target_configurations  # raw measurements in transformed form
-        st.write("self._target_configurations:", tgt)
-        st.write("np.shape(self._target_configurations):", np.shape(tgt))
-    except Exception as e:
-        st.write("Could not print _target:", e)
-    st.write("=================================\n")
+        # 1) what the builder currently holds for target configs
+        try:
+            tgt_np = np.asarray(self._target_configurations)
+            print("self._target_configurations np.shape:", tgt_np.shape)
+        except Exception as e:
+            print("Could not convert self._target_configurations to numpy:", e)
+
+        # 2) get the object that to_botorch() returns (do NOT replace it)
+        try:
+            obj = self.objective.to_botorch()
+            print("type(self.objective.to_botorch()):", type(obj))
+        except Exception as e:
+            print("Failed to obtain objective.to_botorch():", e)
+            obj = None
+
+        # 3) attempt to call it with a tensor derived from the target configurations
+        #    This is only for inspection. Catch/print any exceptions raised.
+        if obj is not None:
+            try:
+                # create a torch tensor similar to what BayBE would pass
+                X = torch.as_tensor(tgt_np)
+                print("tensor X shape:", tuple(X.shape))
+
+                # call the object - in many botorch objects this returns a tensor-like
+                y = obj(X)  # might call .forward(), __call__, etc.
+                print("obj(X) returned type:", type(y))
+
+                # try converting to numpy (if it's a torch Tensor)
+                try:
+                    y_np = y.detach().cpu().numpy()
+                    print("obj(X) -> numpy shape:", y_np.shape)
+                    print("obj(X) -> sample:", y_np if y_np.size <= 20 else y_np.flatten()[:20])
+                except Exception:
+                    # fallback: try np.asarray
+                    try:
+                        y_np = np.asarray(y)
+                        print("obj(X) -> np.asarray shape:", y_np.shape)
+                        print("obj(X) -> sample:", y_np if y_np.size <= 20 else y_np.flatten()[:20])
+                    except Exception as e2:
+                        print("Could not convert obj(X) to numpy:", e2)
+
+            except Exception as e:
+                print("Calling obj(X) raised an exception (expected in some cases):")
+                traceback.print_exc()
+        else:
+            print("Objective.to_botorch() was None or unavailable; skipping obj(X) call.")
+    except Exception as top_e:
+        print("Unexpected error in debug_set_ref_point:", top_e)
+        traceback.print_exc()
+
+    print("=== DEBUG: leaving _set_ref_point() — calling original implementation ===\n")
+    # finally call the original implementation so normal behavior continues
     return _original_set_ref_point(self)
 
-builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
+# install the monkey-patch
+BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
 
-from baybe.recommenders.pure.bayesian.base import BayesianRecommender
-_original_setup = BayesianRecommender._setup_botorch_acqf
-
-def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
-    st.write("\n=== entering _setup_botorch_acqf() ===")
-    st.write("measurements targets shape before objective transform:")
-    if hasattr(measurements, "targets"):
-        st.write(np.asarray(measurements.targets).shape)
-        st.write(np.asarray(measurements.targets))
-    st.write("=======================================")
-    return _original_setup(self, searchspace, objective, measurements, pending)
-
-BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
-
-
-import numpy as np
-from baybe.objectives.botorch import ChainedMCObjective
-
-_original_to_botorch = ChainedMCObjective.to_botorch
-
-def debug_to_botorch(self):
-    botorch_f = _original_to_botorch(self)
-
-    def wrapped(x):
-        x_np = np.asarray(x)
-        print("\n=== objective.to_botorch() received ===")
-        print("x shape:", x_np.shape)
-        print("x:", x_np)
-
-        y = botorch_f(x)
-        y_np = np.asarray(y)
-        print("=== objective.to_botorch() output ===")
-        print("y shape:", y_np.shape)
-        print("y:", y_np)
-        print("=======================================\n")
-        return y
-
-    return wrapped
-
-ChainedMCObjective.to_botorch = debug_to_botorch
 
 
 # Map the function names to the actual functions using a dictionary
