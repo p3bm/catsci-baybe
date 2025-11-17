@@ -60,8 +60,19 @@ def debug_set_ref_point(self):
 
 builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
 
+from baybe.recommenders.pure.bayesian.base import BayesianRecommender
+_original_setup = BayesianRecommender._setup_botorch_acqf
 
+def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
+    print("\n=== entering _setup_botorch_acqf() ===")
+    print("measurements targets shape before objective transform:")
+    if hasattr(measurements, "targets"):
+        print(np.asarray(measurements.targets).shape)
+        print(np.asarray(measurements.targets))
+    print("=======================================")
+    return _original_setup(self, searchspace, objective, measurements, pending)
 
+BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
 
 
 # Map the function names to the actual functions using a dictionary
