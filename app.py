@@ -75,6 +75,33 @@ def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending
 BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
 
 
+import numpy as np
+from baybe.objectives import DesirabilityObjective
+
+_original_to_botorch = DesirabilityObjective.to_botorch
+
+def debug_to_botorch(self):
+    botorch_f = _original_to_botorch(self)
+
+    def wrapped(x):
+        x_np = np.asarray(x)
+        print("\n=== objective.to_botorch() received ===")
+        print("x shape:", x_np.shape)
+        print("x:", x_np)
+
+        y = botorch_f(x)
+        y_np = np.asarray(y)
+        print("=== objective.to_botorch() output ===")
+        print("y shape:", y_np.shape)
+        print("y:", y_np)
+        print("=======================================\n")
+        return y
+
+    return wrapped
+
+DesirabilityObjective.to_botorch = debug_to_botorch
+
+
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
     'Random': RandomRecommender(),
