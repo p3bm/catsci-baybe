@@ -50,9 +50,9 @@ def debug_set_ref_point(self):
     st.write("\n=== entering _set_ref_point() ===")
     # What does the builder think the target tensor is?
     try:
-        tgt = self._target  # raw measurements in transformed form
-        st.write("self._target:", tgt)
-        st.write("np.shape(self._target):", np.shape(tgt))
+        tgt = self._target_configurations  # raw measurements in transformed form
+        st.write("self._target_configurations:", tgt)
+        st.write("np.shape(self._target_configurations):", np.shape(tgt))
     except Exception as e:
         st.write("Could not print _target:", e)
     st.write("=================================\n")
