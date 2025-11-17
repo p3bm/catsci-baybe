@@ -25,7 +25,7 @@ from streamlit_shap import st_shap
 import baybe.acquisition.acqfs as acqfs
 import numpy as np
 
-_original_compute_ref_point = acqfs.compute_ref_point
+_original_compute_ref_point = acqfs._ExpectedHypervolumeImprovement.compute_ref_point
 
 def debug_compute_ref_point(array, maximize=None, factor=0.1):
     st.write("=== compute_ref_point() received array ===")
@@ -39,7 +39,7 @@ def debug_compute_ref_point(array, maximize=None, factor=0.1):
     st.write("==========================================")
     return _original_compute_ref_point(array, maximize, factor)
 
-acqfs.compute_ref_point = debug_compute_ref_point
+acqfs._ExpectedHypervolumeImprovement.compute_ref_point = debug_compute_ref_point
 
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
