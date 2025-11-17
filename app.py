@@ -22,6 +22,48 @@ import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
 
+
+import baybe.acquisition.acqfs as acqfs
+import numpy as np
+
+_original_compute_ref_point = acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point
+
+def debug_compute_ref_point(array, maximize=None, factor=0.1):
+    print("=== compute_ref_point() received array ===")
+    print("type:", type(array))
+    try:
+        arr_np = np.asarray(array)
+        print("shape:", arr_np.shape)
+        print("array:", arr_np)
+    except Exception as e:
+        print("array conversion failed:", e)
+    print("==========================================")
+    return _original_compute_ref_point(array, maximize, factor)
+
+acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point = debug_compute_ref_point
+
+import baybe.acquisition._builder as builder
+
+_original_set_ref_point = builder.BotorchAcquisitionFunctionBuilder._set_ref_point
+
+def debug_set_ref_point(self):
+    print("\n=== entering _set_ref_point() ===")
+    # What does the builder think the target tensor is?
+    try:
+        tgt = self._target  # raw measurements in transformed form
+        print("self._target:", tgt)
+        print("np.shape(self._target):", np.shape(tgt))
+    except Exception as e:
+        print("Could not print _target:", e)
+    print("=================================\n")
+    return _original_set_ref_point(self)
+
+builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
+
+
+
+
+
 # Map the function names to the actual functions using a dictionary
 strategy_functions_first = {
     'Random': RandomRecommender(),
