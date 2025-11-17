@@ -76,9 +76,9 @@ BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
 
 
 import numpy as np
-from baybe.objectives import MCAcquisitionObjective
+from baybe.objectives.botorch import ChainedMCObjective
 
-_original_to_botorch = MCAcquisitionObjective.to_botorch
+_original_to_botorch = ChainedMCObjective.to_botorch
 
 def debug_to_botorch(self):
     botorch_f = _original_to_botorch(self)
@@ -99,7 +99,7 @@ def debug_to_botorch(self):
 
     return wrapped
 
-MCAcquisitionObjective.to_botorch = debug_to_botorch
+ChainedMCObjective.to_botorch = debug_to_botorch
 
 
 # Map the function names to the actual functions using a dictionary
