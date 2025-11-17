@@ -35,7 +35,7 @@ def debug_compute_ref_point(array, maximize=None, factor=0.1):
 
 acqfs._ExpectedHypervolumeImprovement.compute_ref_point = debug_compute_ref_point
 
-import baybe.acquisition._builder as builder
+"""import baybe.acquisition._builder as builder
 
 _original_set_ref_point = builder.BotorchAcquisitionFunctionBuilder._set_ref_point
 
@@ -51,9 +51,9 @@ def debug_set_ref_point(self):
     print("=================================\n")
     return _original_set_ref_point(self)
 
-builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
+builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point"""
 
-"""from baybe.recommenders.pure.bayesian.base import BayesianRecommender
+from baybe.recommenders.pure.bayesian.base import BayesianRecommender
 _original_setup = BayesianRecommender._setup_botorch_acqf
 
 def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
@@ -83,7 +83,7 @@ def debug_to_botorch(self):
         return y
     return wrapped
 
-DesirabilityObjective.to_botorch = debug_to_botorch"""
+DesirabilityObjective.to_botorch = debug_to_botorch
 
 
 # Map the function names to the actual functions using a dictionary
