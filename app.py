@@ -29,15 +29,15 @@ import numpy as np
 _original_compute_ref_point = acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point
 
 def debug_compute_ref_point(array, maximize=None, factor=0.1):
-    print("=== compute_ref_point() received array ===")
-    print("type:", type(array))
+    st.write("=== compute_ref_point() received array ===")
+    st.write("type:", type(array))
     try:
         arr_np = np.asarray(array)
-        print("shape:", arr_np.shape)
-        print("array:", arr_np)
+        st.write("shape:", arr_np.shape)
+        st.write("array:", arr_np)
     except Exception as e:
-        print("array conversion failed:", e)
-    print("==========================================")
+        st.write("array conversion failed:", e)
+    st.write("==========================================")
     return _original_compute_ref_point(array, maximize, factor)
 
 acqfs.qNoisyExpectedHypervolumeImprovement.compute_ref_point = debug_compute_ref_point
@@ -47,15 +47,15 @@ import baybe.acquisition._builder as builder
 _original_set_ref_point = builder.BotorchAcquisitionFunctionBuilder._set_ref_point
 
 def debug_set_ref_point(self):
-    print("\n=== entering _set_ref_point() ===")
+    st.write("\n=== entering _set_ref_point() ===")
     # What does the builder think the target tensor is?
     try:
         tgt = self._target  # raw measurements in transformed form
-        print("self._target:", tgt)
-        print("np.shape(self._target):", np.shape(tgt))
+        st.write("self._target:", tgt)
+        st.write("np.shape(self._target):", np.shape(tgt))
     except Exception as e:
-        print("Could not print _target:", e)
-    print("=================================\n")
+        st.write("Could not print _target:", e)
+    st.write("=================================\n")
     return _original_set_ref_point(self)
 
 builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
@@ -64,12 +64,12 @@ from baybe.recommenders.pure.bayesian.base import BayesianRecommender
 _original_setup = BayesianRecommender._setup_botorch_acqf
 
 def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
-    print("\n=== entering _setup_botorch_acqf() ===")
-    print("measurements targets shape before objective transform:")
+    st.write("\n=== entering _setup_botorch_acqf() ===")
+    st.write("measurements targets shape before objective transform:")
     if hasattr(measurements, "targets"):
-        print(np.asarray(measurements.targets).shape)
-        print(np.asarray(measurements.targets))
-    print("=======================================")
+        st.write(np.asarray(measurements.targets).shape)
+        st.write(np.asarray(measurements.targets))
+    st.write("=======================================")
     return _original_setup(self, searchspace, objective, measurements, pending)
 
 BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
