@@ -53,7 +53,7 @@ def debug_set_ref_point(self):
 
 builder.BotorchAcquisitionFunctionBuilder._set_ref_point = debug_set_ref_point
 
-from baybe.recommenders.pure.bayesian.base import BayesianRecommender
+"""from baybe.recommenders.pure.bayesian.base import BayesianRecommender
 _original_setup = BayesianRecommender._setup_botorch_acqf
 
 def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending):
@@ -67,7 +67,7 @@ def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending
 
 BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
 
-"""from baybe.objectives import DesirabilityObjective
+from baybe.objectives import DesirabilityObjective
 
 _original_to_botorch = DesirabilityObjective.to_botorch
 
