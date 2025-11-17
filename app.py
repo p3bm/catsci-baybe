@@ -67,9 +67,9 @@ def debug_setup_botorch_acqf(self, searchspace, objective, measurements, pending
 
 BayesianRecommender._setup_botorch_acqf = debug_setup_botorch_acqf
 
-from baybe.objectives import MultiObjective
+from baybe.objectives import DesirabilityObjective
 
-_original_to_botorch = MultiObjective.to_botorch
+_original_to_botorch = DesirabilityObjective.to_botorch
 
 def debug_to_botorch(self):
     f = _original_to_botorch(self)
@@ -83,7 +83,7 @@ def debug_to_botorch(self):
         return y
     return wrapped
 
-MultiObjective.to_botorch = debug_to_botorch
+DesirabilityObjective.to_botorch = debug_to_botorch
 
 
 # Map the function names to the actual functions using a dictionary
