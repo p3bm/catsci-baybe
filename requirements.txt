@@ -1,6 +1,7 @@
 pandas
-streamlit
 baybe
-shap
+streamlit
 streamlit-shap
+shap
+scikit-fingerprints
 matplotlib
