@@ -104,7 +104,9 @@ def upload_file(key):
         return data
     
     if uploaded_files is not None and uploaded_files.name.split('.')[1] == 'csv':
-        df = pd.read_csv(uploaded_files)
+        raw = uploaded_files.read().decode("utf-8", errors="replace")
+        raw = raw.replace("\r\n", "\n").replace("\r", "\n")
+        df = pd.read_csv(io.StringIO(raw)
         return df
 
 def recommend_input():
