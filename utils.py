@@ -166,7 +166,8 @@ def recommend_reactions(campaign, df, batch_size)-> pd.DataFrame:
 
         if df is not None:
             campaign_recreate.add_measurements(df)
-        st.write("Targets expected:", [t.name for t in campaign_recreate.targets])
+        st.write(f"Acquisition function: {campaign_recreate.get_acquisition_function()}")
+        st.write(f"Surrogate function: {campaign_recreate.get_surrogate()}")
         recommendations = campaign_recreate.recommend(batch_size=batch_size)
         for target_column in target_names:
             recommendations[target_column] = None
