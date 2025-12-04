@@ -113,6 +113,11 @@ def recommend_input():
     past_recommendation = st.toggle('Include existing reaction data')
     if past_recommendation:
         df = upload_file(key='Reactions data CSV')
+        st.write("Uploaded DF:")
+        st.dataframe(df)
+        st.write("Columns:", df.columns.tolist())
+        st.write("Any missing values per column:", df.isna().sum())
+        
         return df
     return None
 
