@@ -321,7 +321,6 @@ def main():
 
         acq_functions_single = {
             "Expected Improvement" : "EI",
-            "quasi Expected Improvement" : "qEI",
             "quasi Noisy Expected Improvement" : "qNEI",
             "Log Expected Improvement" : "LogEI",
             "quasi Log Expected Improvement" : "qLogEI",
@@ -336,7 +335,7 @@ def main():
         }
         
         if num_objectives == 1:
-            acq_function_name = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_single], index=1, key="single_obj_acq_func")
+            acq_function_name = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_single], index=3, key="single_obj_acq_func")
             acq_function = acq_functions_single[acq_function_name]
         else:
             acq_function_name = st.selectbox("Select an acquisition function:", options=[key for key in acq_functions_multi], index=1, key="multi_obj_acq_func")
