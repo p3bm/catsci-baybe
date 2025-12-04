@@ -131,7 +131,8 @@ def create_campaign(categorical_variables_dict, substance_variables_dict,
     else:
         objective = SingleTargetObjective(target=objectives[0])
 
-    campaign = Campaign(searchspace=searchspace, objective=objective, recommender=strategy)
+    #campaign = Campaign(searchspace=searchspace, objective=objective, recommender=strategy)
+    campaign = Campaign(searchspace=searchspace, objective=objective)
 
     return campaign.to_json()
 
