@@ -76,8 +76,8 @@ def create_continuous_numerical_fields(num_numerical_variables):
     for i in range(num_numerical_variables):
         with st.container(border=True, key=f"cont_num_var_{i}"):
             variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. equivalents')
-            variable_lower_bound = st.number_input(f"Lower bound of continuous variable {i + 1}", value=0)
-            variable_upper_bound = st.number_input(f"Upper bound of continuous variable {i + 1}", value=1)
+            variable_lower_bound = st.number_input(f"Lower bound of continuous variable {i + 1}", value=0, format="%0.1f")
+            variable_upper_bound = st.number_input(f"Upper bound of continuous variable {i + 1}", value=1, format="%0.1f")
             variable_dict[variable_name] = (variable_lower_bound, variable_upper_bound)
     return variable_dict
 
