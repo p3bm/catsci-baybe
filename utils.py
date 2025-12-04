@@ -6,6 +6,7 @@ from baybe.targets import NumericalTarget
 import streamlit as st
 import pandas as pd
 import json
+import numpy as np
 
 def convert_substance_variable(sub_dict, name):
     """_summary_
