@@ -360,7 +360,8 @@ def main():
 
     if st.session_state.campaign_generated:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button("Download campaign JSON", st.session_state.campaign_json, file_name= f'{now}_{campaign_name}_initial.json')
+        filename = f'{now}_{campaign_name}_initial.json'
+        st.download_button(f"Download {filename}", st.session_state.campaign_json, file_name=filename)
 
     st.divider()
     st.header("Recommend Reactions")
@@ -378,15 +379,18 @@ def main():
 
     if st.session_state.recommendations_made and "new_campaign" in st.session_state and "reactions" in st.session_state:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        current_round = get_current_round(st.session_state.new_campaign)
+        json_filename = f'{now}_{campaign_name}_round{current_round}.json'
+        reactions_filename = f'{now}_{campaign_name}_round{current_round}_reactions.csv'
         
-        st.download_button("Download JSON file",
+        st.download_button(f"Download round {current_round} JSON file",
                            st.session_state.new_campaign,
-                           file_name= f"{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}.json")
+                           file_name=json_filename)
         
-        st.download_button("Download recommended reactions",
+        st.download_button(f"Download recommended round {current_round} reactions",
                            st.session_state.reactions.to_csv(index=False, lineterminator='\r\n').encode('utf-8'),
-                           file_name= f'{now}_{campaign_name}_round{get_current_round(st.session_state.new_campaign)}_reactions.csv',
-                           mime= 'text/csv')
+                           file_name=reactions_filename,
+                           mime='text/csv')
 
         try:
             plot_learning_curve(st.session_state.new_campaign, objective_dict)
