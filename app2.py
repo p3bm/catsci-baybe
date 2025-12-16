@@ -3,6 +3,7 @@ from baybe.objectives import SingleTargetObjective, DesirabilityObjective
 from baybe.parameters import NumericalDiscreteParameter, NumericalContinuousParameter, CategoricalParameter, SubstanceParameter
 from baybe.searchspace import SearchSpace
 from baybe.targets import NumericalTarget
+from typing import Dict, List, Tuple, Optional, Union
 import streamlit as st
 import pandas as pd
 import json
@@ -12,158 +13,227 @@ import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
 
-def convert_substance_variable(sub_dict, name):
-    """_summary_
+def convert_substance_variable(
+    sub_dict: Dict[str, str],
+    name: str,
+) -> SubstanceParameter:
+    """
+    Create a BayBE SubstanceParameter from a name-to-SMILES mapping.
 
     Args:
-        cat_dict (_type_): _description_
-        name (_type_): _description_
+        sub_dict: Mapping of substance labels to SMILES strings.
+        name: Name of the substance parameter.
+
+    Returns:
+        A BayBE SubstanceParameter using Mordred descriptors.
     """
     return SubstanceParameter(name, data=sub_dict, encoding="MORDRED")
 
 
-def convert_categorical_variable(cat_list, name):
-    """_summary_
+def convert_categorical_variable(
+    cat_list: List[str],
+    name: str,
+) -> CategoricalParameter:
+    """
+    Create a BayBE CategoricalParameter.
 
     Args:
-        cat_list (_type_): _description_
-        name (_type_): _description_
+        cat_list: List of allowed categorical values.
+        name: Name of the categorical parameter.
+
+    Returns:
+        A BayBE CategoricalParameter.
     """
     return CategoricalParameter(name, values=cat_list)
 
 
-def convert_discrete_numerical_variable(num_list, name):
-    """_summary_
+def convert_discrete_numerical_variable(
+    num_list: List[float],
+    name: str,
+) -> NumericalDiscreteParameter:
+    """
+    Create a BayBE NumericalDiscreteParameter.
 
     Args:
-        num_list (_type_): _description_
+        num_list: Discrete numeric values the parameter may take.
+        name: Name of the numerical parameter.
+
+    Returns:
+        A BayBE NumericalDiscreteParameter.
     """
     return NumericalDiscreteParameter(name, values=num_list)
 
 
-def convert_continuous_numerical_variable(bounds_tuple, name):
-    """_summary_
+def convert_continuous_numerical_variable(
+    bounds_tuple: Tuple[float, float],
+    name: str,
+) -> NumericalContinuousParameter:
+    """
+    Create a BayBE NumericalContinuousParameter.
 
     Args:
-        bounds_tuple (_type_): _description_
+        bounds_tuple: Lower and upper bounds (min, max).
+        name: Name of the numerical parameter.
+
+    Returns:
+        A BayBE NumericalContinuousParameter.
     """
     return NumericalContinuousParameter(name, bounds=bounds_tuple)
 
 
-def convert_objective_variable(name, mode, bounds):
-    """_summary_
+def convert_objective_variable(
+    name: str,
+    mode: str,
+    bounds: List[float],
+) -> NumericalTarget:
+    """
+    Create a normalized ramp objective target.
 
     Args:
-        name (_type_): _description_
-        mode (_type_): _description_
-        bounds (_type_): _description_
-    """
+        name: Objective name (must match measurement column).
+        mode: Optimization mode ("min" or "max").
+        bounds: Lower and upper cutoff values for normalization.
 
-    min_mode = False
-    
-    if mode.lower() == "min":
-        min_mode = True
+    Returns:
+        A BayBE NumericalTarget.
+
+    Raises:
+        ValueError: If bounds are invalid.
+    """
+    descending = mode.lower() == "min"
 
     if bounds[0] >= bounds[1]:
         raise ValueError(f"Objective '{name}' has invalid bounds")
 
-    target = NumericalTarget.normalized_ramp(name, cutoffs=(bounds[0], bounds[1]), descending=min_mode)
-    
-    return target
+    return NumericalTarget.normalized_ramp(
+        name,
+        cutoffs=(bounds[0], bounds[1]),
+        descending=descending,
+    )
 
 
-def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> tuple[list, list]:
-    
-    parameters = []
-    objectives = []
-    """_summary_
+def convert_params(
+    cat_var_dict: Dict[str, List[str]],
+    sub_var_dict: Dict[str, Dict[str, str]],
+    num_disc_var_dict: Dict[str, List[float]],
+    num_cont_var_dict: Dict[str, Tuple[float, float]],
+    obj_dict: Dict[str, Dict[str, Union[str, List[float]]]],
+) -> Tuple[List, List[NumericalTarget]]:
+    """
+    Convert user-defined parameter and objective dictionaries into
+    BayBE parameter and target objects.
 
     Args:
-        cat_var_dict (_type_): _description_
-        sub_var_dict (_type_): _description_
-        num_disc_var_dict (_type_): _description_
-        num_cont_var_dict (_type_): _description_
-        obj_dict (_type_): _description_
+        cat_var_dict: Categorical variable definitions.
+        sub_var_dict: Substance variable definitions.
+        num_disc_var_dict: Discrete numerical variable definitions.
+        num_cont_var_dict: Continuous numerical variable definitions.
+        obj_dict: Objective definitions including mode and bounds.
 
     Returns:
-        list: _description_
+        A tuple of (parameters, objectives).
     """
-    for cat in cat_var_dict:
-        
-        variable = convert_categorical_variable(cat_list=cat_var_dict[cat], name=cat)
-        parameters.append(variable)
+    parameters: List = []
+    objectives: List[NumericalTarget] = []
 
-    for sub in sub_var_dict:
-        
-        variable = convert_substance_variable(sub_dict=sub_var_dict[sub], name=sub)
-        parameters.append(variable)
+    for name, values in cat_var_dict.items():
+        parameters.append(convert_categorical_variable(values, name))
 
-    for num in num_disc_var_dict:
-        
-        variable = convert_discrete_numerical_variable(num_list=num_disc_var_dict[num], name=num)
-        parameters.append(variable)
+    for name, values in sub_var_dict.items():
+        parameters.append(convert_substance_variable(values, name))
 
-    for num in num_cont_var_dict:
-        
-        variable = convert_continuous_numerical_variable(bounds_tuple=num_cont_var_dict[num], name=num)
-        parameters.append(variable)
-    
-    for obj in obj_dict:
-        values = obj_dict[obj]
-        target = convert_objective_variable(name=obj, mode=values["mode"].upper(), bounds=values["bounds"])
-        objectives.append(target)
+    for name, values in num_disc_var_dict.items():
+        parameters.append(convert_discrete_numerical_variable(values, name))
+
+    for name, bounds in num_cont_var_dict.items():
+        parameters.append(convert_continuous_numerical_variable(bounds, name))
+
+    for name, values in obj_dict.items():
+        objectives.append(
+            convert_objective_variable(
+                name=name,
+                mode=values["mode"],
+                bounds=values["bounds"],
+            )
+        )
 
     return parameters, objectives
 
 
-def create_campaign(categorical_variables_dict, substance_variables_dict, 
-                    disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                    objective_dict, weights):
-    """_summary_
+def create_campaign(
+    categorical_variables_dict: Dict[str, List[str]],
+    substance_variables_dict: Dict[str, Dict[str, str]],
+    disc_numerical_variables_dict: Dict[str, List[float]],
+    cont_numerical_variables_dict: Dict[str, Tuple[float, float]],
+    objective_dict: Dict[str, Dict[str, Union[str, List[float]]]],
+    weights: Optional[List[int]],
+) -> str:
+    """
+    Create a BayBE campaign and serialize it to JSON.
 
     Args:
-        categorical_variables_dict (_type_): _description_
-        substance_variables_dict (_type_): _description_
-        disc_numerical_variables_dict (_type_): _description_
-        cont_numerical_variables_dict (_type_): _description_
-        objective_dict (_type_): _description_
+        categorical_variables_dict: Categorical variable definitions.
+        substance_variables_dict: Substance variable definitions.
+        disc_numerical_variables_dict: Discrete numerical variable definitions.
+        cont_numerical_variables_dict: Continuous numerical variable definitions.
+        objective_dict: Objective definitions.
+        weights: Objective weights for multi-objective optimization.
 
     Returns:
-        _type_: _description_
+        JSON-serialized BayBE campaign.
     """
-    parameters, objectives = convert_params(categorical_variables_dict, substance_variables_dict, 
-                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                            objective_dict)
+    parameters, objectives = convert_params(
+        categorical_variables_dict,
+        substance_variables_dict,
+        disc_numerical_variables_dict,
+        cont_numerical_variables_dict,
+        objective_dict,
+    )
+
     searchspace = SearchSpace.from_product(parameters=parameters)
+
     if len(objectives) > 1:
         objective = DesirabilityObjective(targets=objectives, weights=weights)
     else:
         objective = SingleTargetObjective(target=objectives[0])
 
     campaign = Campaign(searchspace=searchspace, objective=objective)
-
     return campaign.to_json()
 
 
-def recommend_reactions(campaign, df, batch_size)-> pd.DataFrame:
-    recommendations = None
-    campaign_recreate = None
-    if campaign:
-        campaign_recreate = Campaign.from_json(campaign)
-        target_list = campaign_recreate.targets
-        target_names = [target.name for target in target_list]
+def recommend_reactions(
+    campaign: str,
+    df: Optional[pd.DataFrame],
+    batch_size: int,
+) -> Tuple[Optional[pd.DataFrame], Optional[str]]:
+    """
+    Generate a batch of recommended experiments.
 
-        if df is not None:
-            campaign_recreate.add_measurements(df)
-        
-        recommendations = campaign_recreate.recommend(batch_size=batch_size)
-        
-        for target_column in target_names:
-            recommendations[target_column] = None
-    else:
+    Args:
+        campaign: JSON-serialized BayBE campaign.
+        df: Optional DataFrame of previous measurements.
+        batch_size: Number of experiments to recommend.
+
+    Returns:
+        A tuple of (recommendations DataFrame, updated campaign JSON).
+    """
+    if not campaign:
         st.error("Please upload valid file")
+        return None, None
 
-    return recommendations, campaign_recreate.to_json() if campaign_recreate else None
+    campaign_recreate = Campaign.from_json(campaign)
+    target_names = [t.name for t in campaign_recreate.targets]
+
+    if df is not None:
+        campaign_recreate.add_measurements(df)
+
+    recommendations = campaign_recreate.recommend(batch_size=batch_size)
+
+    for target in target_names:
+        recommendations[target] = None
+
+    return recommendations, campaign_recreate.to_json()
+
 
 def create_categorical_fields(num_variables):
     variable_dict = {}
