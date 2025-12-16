@@ -366,10 +366,50 @@ def main():
 
     with st.expander("User Guide"):
         st.markdown("""
-            ### **Overview**
-            This tool helps you **design and optimize chemical reactions** using Bayesian Optimization via **BayBE**.  
-            It suggests which experiments to run next to improve one or more objectives — for example, yield or selectivity.
-            """)
+        ## Overview
+        The **Bayesian Reaction Optimizer** is an interactive tool for **designing and optimizing chemical reactions** using Bayesian optimization powered by **BayBE**.
+        Instead of exploring reaction conditions by trial and error, the tool learns from previous experiments and **recommends the most informative next reactions to run**. It supports categorical variables (e.g. solvent, catalyst), numerical variables (e.g. temperature, equivalents), and structure-aware substance variables (via molecular descriptors). One or more experimental objectives—such as yield or selectivity—can be optimized simultaneously.
+        The workflow is fully iterative: define your reaction space, run suggested experiments, upload the results, and generate improved recommendations in subsequent rounds.
+        ---
+        ## How to Use the Tool
+        ### 1. Define the Reaction Space
+        - Specify **reaction parameters**:
+          - **Categorical variables** (e.g. base treatment, atmosphere)
+          - **Substance variables** (e.g. solvent or ligand, defined by SMILES)
+          - **Numerical variables** (either discrete *or* continuous)
+        - Define one or more **objectives** (e.g. yield, conversion), including:
+          - Optimization mode (`max` or `min`)
+          - Expected lower and upper bounds
+        > **Note:** Discrete and continuous numerical variables cannot be mixed in the same campaign.
+        ---
+        ### 2. Generate a Campaign
+        - Click **Generate** to create the Bayesian optimization campaign.
+        - Download the generated campaign JSON file — this represents the full reaction design space and optimization state.
+        ---
+        ### 3. Get Reaction Recommendations
+        - Upload the **latest campaign JSON**.
+        - *(Optional)* Upload a CSV containing results from previously run reactions.
+        - Specify how many new reactions you want to run.
+        - Click **Get recommendations** to receive a ranked list of suggested experiments.
+        ---
+        ### 4. Run Experiments and Iterate
+        - Perform the recommended reactions in the lab.
+        - Record results (including objective values and batch number).
+        - Upload the updated results in the next round to refine future recommendations.
+        ---
+        ### 5. Analyze Progress (Optional)
+        - Visualize **learning curves** showing objective improvement across rounds.
+        - View **feature importance (SHAP)** to understand which parameters most influence the model.
+        ---
+        ## Typical Workflow
+        1. Define parameters and objectives  
+        2. Generate campaign  
+        3. Run suggested reactions  
+        4. Upload results  
+        5. Repeat until optimal conditions are found  
+        ---
+        This tool is designed to **reduce experimental effort**, **accelerate optimization**, and **provide insight into reaction behavior** while remaining easy to use for non-experts in machine learning.
+        """)
 
     # Store the initial value of widgets in session state
     if "visibility" not in st.session_state:
