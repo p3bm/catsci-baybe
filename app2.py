@@ -367,6 +367,7 @@ def main():
     with st.expander("User Guide"):
         st.markdown("""
         ## Overview
+        
         The **Bayesian Reaction Optimizer** is an interactive tool for **designing and optimizing chemical reactions** using Bayesian optimization powered by **BayBE**.
         Instead of exploring reaction conditions by trial and error, the tool learns from previous experiments and **recommends the most informative next reactions to run**. It supports categorical variables (e.g. solvent, catalyst), numerical variables (e.g. temperature, equivalents), and structure-aware substance variables (via molecular descriptors). One or more experimental objectives—such as yield or selectivity—can be optimized simultaneously.
         The workflow is fully iterative: define your reaction space, run suggested experiments, upload the results, and generate improved recommendations in subsequent rounds.
