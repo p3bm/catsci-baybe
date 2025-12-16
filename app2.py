@@ -404,13 +404,6 @@ def main():
         ### 5. Analyze Progress (Optional)
         - Visualize learning curves showing objective improvement across rounds.
         - View feature importance (SHAP analysis) to understand which parameters most influence the model.
-        ---
-        ## Typical Workflow
-        1. Define parameters and objectives  
-        2. Generate campaign  
-        3. Run suggested reactions  
-        4. Upload results  
-        5. Repeat until optimal conditions are found
         """)
 
     # Store the initial value of widgets in session state
