@@ -6,7 +6,6 @@ from baybe.targets import NumericalTarget
 import streamlit as st
 import pandas as pd
 import json
-import streamlit as st
 from io import StringIO
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -65,12 +64,16 @@ def convert_objective_variable(name, mode, bounds):
     if mode.lower() == "min":
         min_mode = True
 
+    if bounds[0] >= bounds[1]:
+        raise ValueError(f"Objective '{name}' has invalid bounds")
+
     target = NumericalTarget.normalized_ramp(name, cutoffs=(bounds[0], bounds[1]), descending=min_mode)
     
     return target
 
 
-def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> list:
+def convert_params(cat_var_dict, sub_var_dict, num_disc_var_dict, num_cont_var_dict, obj_dict) -> tuple[list, list]:
+    
     parameters = []
     objectives = []
     """_summary_
@@ -147,37 +150,16 @@ def recommend_reactions(campaign, df, batch_size)-> pd.DataFrame:
     campaign_recreate = None
     if campaign:
         campaign_recreate = Campaign.from_json(campaign)
-        campaign_json = json.loads(campaign)
-        # Retrieve the objective
-        objective = campaign_json.get("objective", {})
-
-        # Check for "target" and "targets" in the objective
-        if "target" in objective:
-            # If "target" is a dictionary, convert it to a list containing that dictionary
-            if isinstance(objective["target"], dict):
-                target_list = [objective["target"]]
-            else:
-                st.error("The target value is not a dictionary.")
-        elif "targets" in objective:
-            # If "targets" is a list, use it directly
-            if isinstance(objective["targets"], list):
-                target_list = objective["targets"]
-            else:
-                st.error("Error in objective")
-        
-        target_names = [target["name"] for target in target_list]
+        target_list = campaign_recreate.targets
+        target_names = [target.name for target in target_list]
 
         if df is not None:
             campaign_recreate.add_measurements(df)
-        try:
-            st.write(f"Acquisition function: {campaign_recreate.get_acquisition_function()}")
-            st.write(f"Surrogate function: {campaign_recreate.get_surrogate()}")
-        except:
-            None
+        
         recommendations = campaign_recreate.recommend(batch_size=batch_size)
+        
         for target_column in target_names:
             recommendations[target_column] = None
-        
     else:
         st.error("Please upload valid file")
 
@@ -214,7 +196,7 @@ def create_discrete_numerical_fields(num_numerical_variables):
             variable_name = st.text_input(f"Variable {i + 1} name:", placeholder = 'E.g. temperature')
             variable_values = st.text_input(f"Variable {i + 1} values (comma-separated):", placeholder= "40,60,80")
             
-        values = [value.strip() for value in variable_values.split(',')]
+        values = [float(value.strip()) for value in variable_values.split(',')]
         variable_dict[variable_name] = values
     return variable_dict
 
@@ -370,9 +352,8 @@ def main():
         objective_dict = create_objective_fields(num_objectives)
     
         if num_objectives > 1:
-            objective_weights = st.text_input("Target Objective weights (comma-separated):", placeholder= "50,50")
-            vals = objective_weights.split(',')
-            weights = [int(value.strip()) for value in vals if value.strip().isdigit()]
+            objective_weights = st.text_input("Target Objective weights (comma-separated and should sum to 100):", placeholder= "50,50")
+            weights = [int(value.strip()) for value in objective_weights.split(',')]
         
             if num_objectives != len(weights):
                 st.warning("Please make sure there are the same number of objectives as objective weights.")
