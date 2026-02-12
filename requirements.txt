@@ -5,4 +5,3 @@ streamlit-shap
 shap
 scikit-fingerprints
 matplotlib
-stlite==0.31.0
