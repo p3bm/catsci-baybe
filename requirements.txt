@@ -5,3 +5,4 @@ streamlit-shap
 shap
 scikit-fingerprints
 matplotlib
+altair==4
