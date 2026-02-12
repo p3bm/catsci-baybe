@@ -1,6 +1,6 @@
 pandas
 baybe
-streamlit==1.21
+streamlit
 streamlit-shap
 shap
 scikit-fingerprints
