@@ -1,3 +1,4 @@
+setuptools
 pandas
 baybe
 streamlit==1.21
