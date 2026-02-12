@@ -5,4 +5,4 @@ streamlit-shap
 shap
 scikit-fingerprints
 matplotlib
-altair==4
+stlite==0.31.0
