@@ -251,7 +251,7 @@ def create_substance_fields(num_variables):
     for i in range(num_variables):
         with st.container(border=True, key=f"sub_var_{i}"):
             variable_name = st.text_input(f"Variable {i + 1} title:", placeholder = 'E.g. solvent')
-            variable_values = st.text_input(f"Variable {i + 1} names (comma-separated):", placeholder= "methanol, ethanol, etc.")
+            variable_values = st.text_input(f"Variable {i + 1} names (semicolon-separated!):", placeholder= "methanol, ethanol, etc.")
             variable_smile_values = st.text_input(f"Variable {i + 1} SMILE strings (comma-separated):", placeholder= "CO, CCO, etc.")
 
         keys = [value.strip() for value in variable_values.split(';')]
