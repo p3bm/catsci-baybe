@@ -1,6 +1,6 @@
 from baybe import Campaign
 from baybe.objectives import SingleTargetObjective, DesirabilityObjective
-from baybe.parameters import NumericalDiscreteParameter, NumericalContinuousParameter, CategoricalParameter, SubstanceParameter
+from baybe.parameters import NumericalDiscreteParameter, NumericalContinuousParameter, CategoricalParameter, SubstanceParameter, TaskParameter
 from baybe.searchspace import SearchSpace
 from baybe.targets import NumericalTarget
 from typing import Dict, List, Tuple, Optional, Union
@@ -81,6 +81,23 @@ def convert_continuous_numerical_variable(
     return NumericalContinuousParameter(name, bounds=bounds_tuple)
 
 
+def convert_task_variable(
+    task_list: List[str],
+    name: str,
+) -> TaskParameter:
+    """
+    Create a BayBE TaskParameter.
+
+    Args:
+        task_list: List of task parameter values.
+        name: Name of the numerical parameter.
+
+    Returns:
+        A BayBE TaskParameter.
+    """
+    return TaskParameter(name=name, values=task_list)
+
+
 def convert_objective_variable(
     name: str,
     mode: str,
@@ -117,6 +134,7 @@ def convert_params(
     sub_var_dict: Dict[str, Dict[str, str]],
     num_disc_var_dict: Dict[str, List[float]],
     num_cont_var_dict: Dict[str, Tuple[float, float]],
+    task_var_dict: Dict[str, List[str]],
     obj_dict: Dict[str, Dict[str, Union[str, List[float]]]],
 ) -> Tuple[List, List[NumericalTarget]]:
     """
@@ -128,6 +146,7 @@ def convert_params(
         sub_var_dict: Substance variable definitions.
         num_disc_var_dict: Discrete numerical variable definitions.
         num_cont_var_dict: Continuous numerical variable definitions.
+        task_var_dict: Task parameter values.
         obj_dict: Objective definitions including mode and bounds.
 
     Returns:
@@ -148,6 +167,9 @@ def convert_params(
     for name, bounds in num_cont_var_dict.items():
         parameters.append(convert_continuous_numerical_variable(bounds, name))
 
+    for name, values in task_var_dict.items():
+        parameters.append(convert_task_variable(values, name))
+
     for name, values in obj_dict.items():
         objectives.append(
             convert_objective_variable(
@@ -165,6 +187,7 @@ def create_campaign(
     substance_variables_dict: Dict[str, Dict[str, str]],
     disc_numerical_variables_dict: Dict[str, List[float]],
     cont_numerical_variables_dict: Dict[str, Tuple[float, float]],
+    task_variables_dict: Dict[str, List[str]],
     objective_dict: Dict[str, Dict[str, Union[str, List[float]]]],
     weights: Optional[List[int]],
 ) -> str:
@@ -176,6 +199,7 @@ def create_campaign(
         substance_variables_dict: Substance variable definitions.
         disc_numerical_variables_dict: Discrete numerical variable definitions.
         cont_numerical_variables_dict: Continuous numerical variable definitions.
+        task_variables_dict: Task parameter values.
         objective_dict: Objective definitions.
         weights: Objective weights for multi-objective optimization.
 
@@ -187,6 +211,7 @@ def create_campaign(
         substance_variables_dict,
         disc_numerical_variables_dict,
         cont_numerical_variables_dict,
+        task_variables_dict,
         objective_dict,
     )
 
@@ -278,6 +303,17 @@ def create_continuous_numerical_fields(num_numerical_variables):
             variable_lower_bound = st.number_input(f"Lower bound of continuous variable {i + 1}", value=0.0, format="%0.1f")
             variable_upper_bound = st.number_input(f"Upper bound of continuous variable {i + 1}", value=1.0, format="%0.1f")
             variable_dict[variable_name] = (variable_lower_bound, variable_upper_bound)
+    return variable_dict
+
+def create_task_fields(num_variables):
+    variable_dict = {}
+    for i in range(num_variables):
+        with st.container(border=True, key=f"task_var_{i}"):
+            variable_name = st.text_input(f"Task {i + 1} title:", placeholder = 'E.g. substrate')
+            variable_values = st.text_input(f"Task {i + 1} categories (semicolon-separated!):", placeholder= "SM-Cl; SM-Br; SM-I")
+            
+        values = [value.strip() for value in variable_values.split(';')]
+        variable_dict[variable_name] = values
     return variable_dict
 
 def create_objective_fields(num_objective_variables):
@@ -450,6 +486,13 @@ def main():
         
         cont_numerical_variables_dict = create_continuous_numerical_fields(num_cont_numerical_variables)
 
+    with st.container(border=True, key="task_vars"):
+        st.subheader("Task Parameters for Transfer Learning")
+    
+        num_task_variables = st.number_input("How many task parameters do you have?", min_value=0, value=0, key = 'task')
+        
+        task_variables_dict = create_task_fields(num_task_variables)
+
     with st.container(border=True, key="objs"):
         st.subheader("Objectives")
         
@@ -471,8 +514,8 @@ def main():
     if st.button("Generate"):
         with st.spinner('Processing...'):
             st.session_state.campaign_json = create_campaign(categorical_variables_dict, substance_variables_dict, 
-                                            disc_numerical_variables_dict, cont_numerical_variables_dict, 
-                                            objective_dict, weights)
+                                            disc_numerical_variables_dict, cont_numerical_variables_dict,
+                                            task_variables_dict, objective_dict, weights)
 
             st.session_state.campaign_generated = True
 
