@@ -488,6 +488,12 @@ def main():
 
     with st.container(border=True, key="task_vars"):
         st.subheader("Task Parameters for Transfer Learning")
+
+        st.write("""
+        Transfer learning allows the optimiser to take information from a similar but not identical campagin and apply the learning to the current campaign. 
+        The task parameters can be used to indicate these similar campaigns that might differ in some way that is difficult to quantify, such as reactions 
+        carried out by a different operator or at a different site. Use sparingly as too much uncorrelated data can hinder optimiser performance.
+        """)
     
         num_task_variables = st.number_input("How many task parameters do you have?", min_value=0, value=0, key = 'task')
         
