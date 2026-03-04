@@ -84,6 +84,7 @@ def convert_continuous_numerical_variable(
 def convert_task_variable(
     task_list: List[str],
     name: str,
+    active_values: List[str],
 ) -> TaskParameter:
     """
     Create a BayBE TaskParameter.
@@ -95,7 +96,7 @@ def convert_task_variable(
     Returns:
         A BayBE TaskParameter.
     """
-    return TaskParameter(name=name, values=task_list)
+    return TaskParameter(name=name, values=task_list, active_value=active_values)
 
 
 def convert_objective_variable(
@@ -134,7 +135,7 @@ def convert_params(
     sub_var_dict: Dict[str, Dict[str, str]],
     num_disc_var_dict: Dict[str, List[float]],
     num_cont_var_dict: Dict[str, Tuple[float, float]],
-    task_var_dict: Dict[str, List[str]],
+    task_var_dict: Dict[str, Tuple[List[str],List[str]]],
     obj_dict: Dict[str, Dict[str, Union[str, List[float]]]],
 ) -> Tuple[List, List[NumericalTarget]]:
     """
@@ -167,8 +168,9 @@ def convert_params(
     for name, bounds in num_cont_var_dict.items():
         parameters.append(convert_continuous_numerical_variable(bounds, name))
 
-    for name, values in task_var_dict.items():
-        parameters.append(convert_task_variable(values, name))
+    for name, values_tuple in task_var_dict.items():
+        values, active_values = values_tuple
+        parameters.append(convert_task_variable(values, name, active_values))
 
     for name, values in obj_dict.items():
         objectives.append(
@@ -187,7 +189,7 @@ def create_campaign(
     substance_variables_dict: Dict[str, Dict[str, str]],
     disc_numerical_variables_dict: Dict[str, List[float]],
     cont_numerical_variables_dict: Dict[str, Tuple[float, float]],
-    task_variables_dict: Dict[str, List[str]],
+    task_variables_dict: Dict[str, Tuple[List[str],List[str]]],
     objective_dict: Dict[str, Dict[str, Union[str, List[float]]]],
     weights: Optional[List[int]],
 ) -> str:
@@ -313,7 +315,10 @@ def create_task_fields(num_variables):
             variable_values = st.text_input(f"Task {i + 1} categories (semicolon-separated!):", placeholder= "SM-Cl; SM-Br; SM-I")
             
         values = [value.strip() for value in variable_values.split(';')]
-        variable_dict[variable_name] = values
+
+        active_values = st.multiselect(f"Active values for task {i + 1}:", options=values, key="task_var_active_values")
+        
+        variable_dict[variable_name] = (values, active_values)
     return variable_dict
 
 def create_objective_fields(num_objective_variables):
@@ -492,7 +497,8 @@ def main():
         st.write("""
         Transfer learning allows the optimiser to take information from a similar but not identical campagin and apply the learning to the current campaign. 
         The task parameters can be used to indicate these similar campaigns that might differ in some way that is difficult to quantify, such as reactions 
-        carried out by a different operator or at a different site. Use sparingly as too much uncorrelated data can hinder optimiser performance.
+        carried out by a different operator or at a different site. Values that should only be recommended for the current campaign can be set as "active 
+        values". Use sparingly as too much uncorrelated data can hinder optimiser performance.
         """)
     
         num_task_variables = st.number_input("How many task parameters do you have?", min_value=0, value=0, key = 'task')
