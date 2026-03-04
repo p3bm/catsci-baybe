@@ -315,7 +315,7 @@ def create_task_fields(num_variables):
             variable_values = st.text_input(f"Task {i + 1} categories (semicolon-separated!):", placeholder= "SM-Cl; SM-Br; SM-I")
             
             values = [value.strip() for value in variable_values.split(';')]
-            active_values = st.multiselect(f"Active values for task {i + 1}:", options=values, key="task_var_active_values")
+            active_values = st.multiselect(f"Active values for task {i + 1}:", options=values, key=f"task_var_{i}_active_values")
         
         variable_dict[variable_name] = (values, active_values)
     return variable_dict
